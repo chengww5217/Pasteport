@@ -6,15 +6,23 @@ on:
   push:
     tags: ['v*']
 
-# Publishing to the Marketplace is deliberately not automated: it is irreversible
-# (a version number can never be reused) and needs a VSCE_PAT secret. This job
-# builds the vsix, proves it passes the same checks as CI, and attaches it to the
-# GitHub release — `npx @vscode/vsce publish` from that artifact stays manual.
+# The tag builds the vsix once, attaches it to the GitHub release, and publishes that
+# exact file to Open VSX. The VS Code Marketplace is uploaded by hand from the same
+# artifact: publishing there needs an Azure DevOps organization, which now requires a
+# pay-as-you-go Azure subscription, and its web portal accepts a vsix without any
+# token. Automating that step would buy one click at the price of a paid subscription
+# — and global PATs are retired on 1 December 2026 anyway.
+#
+# OVSX_PAT is an Open VSX access token (Eclipse account, publisher agreement signed).
+# A missing token skips publishing with a warning instead of failing the run, so the
+# GitHub release still carries a usable vsix.
 jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
       contents: write # required to create the release and upload the vsix
+    env:
+      OVSX_PAT: ${{ secrets.OVSX_PAT }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -31,6 +39,7 @@ jobs:
       # A tag that disagrees with package.json would produce a vsix whose filename
       # and contents contradict the release it is attached to. Cheaper to fail here.
       - name: Check the tag matches package.json
+        id: version
         run: |
           tag="${GITHUB_REF_NAME#v}"
           manifest="$(node -p 'require("./package.json").version')"
@@ -38,10 +47,38 @@ jobs:
             echo "tag v$tag does not match package.json version $manifest" >&2
             exit 1
           fi
+          case "$tag" in
+            *-*) prerelease=true ;;
+            *) prerelease=false ;;
+          esac
+          echo "version=$tag" >>"$GITHUB_OUTPUT"
+          echo "prerelease=$prerelease" >>"$GITHUB_OUTPUT"
 
       - run: npm run package
 
+      # One artifact for every destination: what the release page offers is byte for
+      # byte what Open VSX serves and what gets uploaded to the Marketplace by hand.
+      - name: Locate the vsix
+        id: vsix
+        run: echo "path=dist/pasteport-${{ steps.version.outputs.version }}.vsix" >>"$GITHUB_OUTPUT"
+
       - uses: softprops/action-gh-release@v2
         with:
-          files: dist/*.vsix
+          files: ${{ steps.vsix.outputs.path }}
           generate_release_notes: true
+          prerelease: ${{ steps.version.outputs.prerelease }}
+
+      # Requires the namespace to exist once: npx ovsx create-namespace chengww
+      - name: Publish to Open VSX
+        if: steps.version.outputs.prerelease == 'false' && env.OVSX_PAT != ''
+        run: npx --yes ovsx publish "${{ steps.vsix.outputs.path }}" --pat "$OVSX_PAT"
+
+      - name: Note what is left to do by hand
+        if: steps.vsix.outputs.path != ''
+        run: |
+          if [ "${{ steps.version.outputs.prerelease }}" = "true" ]; then
+            echo "::notice::${GITHUB_REF_NAME} is a prerelease tag; the vsix is attached to the GitHub release and published nowhere."
+          elif [ -z "$OVSX_PAT" ]; then
+            echo "::warning::OVSX_PAT is not configured; Open VSX was skipped."
+          fi
+          echo "::notice::Upload ${{ steps.vsix.outputs.path }} from the GitHub release to https://marketplace.visualstudio.com/manage to reach the VS Code Marketplace."

@@ -117,6 +117,45 @@ An extension keybinding outranks the built-in terminal paste, so any binding add
 the pass-through path working: if the clipboard holds no image or file, `pasteport.paste` has to
 behave exactly like the paste it displaced.
 
+## Releasing
+
+A tag is the whole release process:
+
+```sh
+# bump "version" in package.json and move CHANGELOG's Unreleased entries under it first
+git tag v0.1.0 && git push --tags
+```
+
+`.github/workflows/release.yml` then re-runs every CI check, fails if the tag disagrees with
+`package.json`, packages the vsix once, attaches it to a generated GitHub release and publishes that
+same file to Open VSX.
+
+The VS Code Marketplace is the one manual step: download the vsix from the GitHub release and upload
+it at <https://marketplace.visualstudio.com/manage>. The web portal takes a vsix without any token,
+whereas publishing from CI needs an Azure DevOps organization — and creating one now requires a
+pay-as-you-go Azure subscription. Global Azure DevOps PATs are retired on 1 December 2026 in any
+case, so automating that step would mean buying a subscription for a credential with months left to
+live. One click is cheaper.
+
+Open VSX asks for nothing but an Eclipse account: sign in at <https://open-vsx.org> with GitHub,
+sign the publisher agreement, generate an access token, store it as the repository secret
+`OVSX_PAT`. The namespace has to exist before the first publish, once:
+
+```sh
+npx ovsx create-namespace chengww --pat <token>
+```
+
+It must equal `publisher` in `package.json`; Open VSX rejects a vsix whose publisher does not match
+the namespace it is pushed to. A missing `OVSX_PAT` skips publishing with a warning rather than
+failing the run, so a token-free tag still produces a usable vsix.
+
+A tag with a prerelease suffix (`v0.2.0-rc.1`) still produces a GitHub prerelease with the vsix
+attached, but is published nowhere: the Marketplace accepts `major.minor.patch` only, and the same
+artifact goes to both places.
+
+Publishing is irreversible — a version number can never be reused — so the tag is the point of no
+return, not the commit.
+
 ## Commits
 
 [Conventional Commits](https://www.conventionalcommits.org/): `feat:`, `fix:`, `docs:`, `test:`,
