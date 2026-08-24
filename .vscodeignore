@@ -4,7 +4,6 @@ assets/**
 scripts/**
 out/**
 src/**
-dist/test/**
 dist/**/*.map
 
 # the packaged readme is dist/README.md (see --readme-path); excluding the original

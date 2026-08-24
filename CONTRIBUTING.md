@@ -7,11 +7,11 @@ are especially useful — that command prints every condition a successful paste
 
 ```sh
 npm install
-npm run build       # assets/icon.svg -> dist/icon.png, README.md -> dist/README.md
-npm run compile     # tsc, strict
-npm run lint        # eslint, type-aware rules
-npm run format      # prettier --check (use format:write to fix)
-npm test            # compile + node:test
+npm run compile      # tsc, strict; type-checks into out/, which the tests run from
+npm run build        # esbuild bundle + icon + packaged readme, all into dist/
+npm run lint         # eslint, type-aware rules
+npm run format       # prettier --check (use format:write to fix)
+npm test             # compile + node:test
 ```
 
 Tests use `node:test` with no test framework dependency. They cover the modules that can be wrong
@@ -25,32 +25,46 @@ clipboard, without modifying it.
 
 ## Running the extension
 
-Open the repository in VS Code and press <kbd>F5</kbd>. Note that the interesting behaviour only
-appears in a **remote window**: in a local window every paste falls through to the terminal by
-design, so an end-to-end check needs a Remote - SSH (or Dev Containers / WSL) window with a folder
-open.
+Open the repository in VS Code and press <kbd>F5</kbd>. `npm run watch` keeps `dist/extension.js`
+rebuilt as you edit — unminified and with a source map, unlike the packaged build. Note that the
+interesting behaviour only appears in a **remote window**: in a local window every paste falls
+through to the terminal by design, so an end-to-end check needs a Remote - SSH (or Dev Containers /
+WSL) window with a folder open.
 
 To package:
 
 ```sh
-npm run package     # produces pasteport.vsix
+npm run package     # produces out/pasteport.vsix
 ```
 
-## The icon
+## What ends up in the vsix
 
-`assets/icon.svg` is the source of truth and the only icon file in the repository.
-`scripts/build.mjs` produces the two things vsce needs that are not source files, both into `dist/`
-and neither committed:
+`scripts/build.mjs` produces everything shipped that is not checked in, all under `dist/` and none
+of it committed:
 
+- **`dist/extension.js`** — the whole extension bundled and minified by esbuild into one CommonJS
+  file, about 19 KB against roughly 70 KB of unbundled `tsc` output. `vscode` stays external
+  because the host provides it; nothing else is imported beyond node builtins. The source map is
+  written as `sourcemap: 'external'`, so it exists locally for symbolicating stack traces but is
+  neither packaged nor referenced from the shipped bundle.
 - **`dist/icon.png`** — 256×256, because the Marketplace and the Extensions view accept raster
-  icons only. Edit the SVG; the PNG is disposable.
+  icons only. `assets/icon.svg` is the source of truth and the only icon file in the repository;
+  edit the SVG, the PNG is disposable.
 - **`dist/README.md`** — a copy of `README.md` with the `<!-- icon:begin -->` block removed. vsce
   refuses an SVG anywhere in a README, and the Marketplace renders the icon in the page header
   anyway, so the image is shown on GitHub and left out of the package. `npm run package` passes
   `--readme-path dist/README.md`; keep that flag on any hand-rolled vsce invocation, and note that
   `README.md` itself is in `.vscodeignore` so the two copies cannot collide.
 
-The SVG contains no `<text>`, and the renderer runs with system fonts disabled, so the PNG is
+`tsc` output goes to `out/` instead and is never packaged: it exists to type-check and to give the
+tests plain unbundled modules to run against. esbuild does not type-check, so `npm run compile` and
+`npm run build` are both needed and neither replaces the other. The vsix lands in `out/` too, so the
+repository root stays free of build output.
+
+The icon SVG contains no `<text>`, and the renderer runs with system fonts disabled, so the PNG is
+identical on every machine.
+
+The SVG contains no `<text>`, and the renderer runs with system fonts disabled, so the output is
 identical on every machine.
 
 ## Architecture in one paragraph

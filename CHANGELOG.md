@@ -25,6 +25,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `bracketedPaste`.
 - An extension icon, rasterised from `assets/icon.svg` at package time by `scripts/build.mjs`; no
   image is committed.
+- Packaging through esbuild: the extension ships as one minified `dist/extension.js`, and the vsix
+  contains neither tests nor source maps.
 
 ### Known limitations
 
