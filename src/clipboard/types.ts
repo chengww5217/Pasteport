@@ -35,6 +35,12 @@ export interface ClipboardOther {
 export interface ClipboardError {
   kind: 'error';
   message: string;
+  /**
+   * Set when the user can fix this themselves — a missing Linux clipboard tool,
+   * for instance. Those are worth surfacing once instead of only logging, since
+   * the user just pressed a key and nothing happened.
+   */
+  actionable?: boolean;
 }
 
 export type ClipboardContent = ClipboardFiles | ClipboardImage | ClipboardOther | ClipboardError;

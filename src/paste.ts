@@ -57,6 +57,9 @@ export async function paste(deps: PasteDependencies): Promise<void> {
   const payload = describePayload(content);
   if (payload === undefined) {
     log.debug(`nothing to transfer (${summarize(content)}), passing the paste through`);
+    if (content.kind === 'error' && content.actionable === true) {
+      notifyActionableOnce(content.message, log);
+    }
     return passThroughPaste(log);
   }
 
@@ -201,6 +204,22 @@ function stagedImageName(localPath: string, index: number, count: number): strin
 /** Identical files copied together resolve to one remote path; mention it once. */
 function unique(paths: readonly string[]): string[] {
   return [...new Set(paths)];
+}
+
+/**
+ * Reader problems the user can fix — a missing Linux clipboard tool — are worth
+ * saying out loud, because the alternative is a key that appears to do nothing.
+ * Shown once per session per message, so holding the key down cannot spam it.
+ */
+const notifiedActionable = new Set<string>();
+
+function notifyActionableOnce(message: string, log: Logger): void {
+  if (notifiedActionable.has(message)) return;
+  notifiedActionable.add(message);
+
+  void vscode.window.showWarningMessage(`Pasteport: ${message}`, 'Show Log').then((choice) => {
+    if (choice === 'Show Log') log.show(true);
+  });
 }
 
 function showFailure(message: string, log: Logger): void {

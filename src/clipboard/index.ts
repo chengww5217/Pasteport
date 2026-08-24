@@ -4,6 +4,7 @@ import * as path from 'node:path';
 
 import { describeError, type Logger } from '../log';
 import { readDarwinClipboard } from './darwin';
+import { readLinuxClipboard } from './linux';
 import type { ClipboardContent } from './types';
 import { readWin32Clipboard } from './win32';
 
@@ -71,6 +72,11 @@ function platformRead(context: ReaderContext): (() => Promise<ClipboardContent>)
           stagingDir: STAGING_DIR,
           log: context.log,
         });
+
+    // No resource file: the display server tools are the reader, so there is no
+    // script to hand an interpreter.
+    case 'linux':
+      return () => readLinuxClipboard({ stagingDir: STAGING_DIR, log: context.log });
 
     default:
       return undefined;
