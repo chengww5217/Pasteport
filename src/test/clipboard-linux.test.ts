@@ -8,6 +8,7 @@ import { STAGED_IMAGE_PATTERN } from '../clipboard/index';
 import {
   chooseBackends,
   fileUriToPath,
+  packageFor,
   parseTargets,
   parseUriList,
   pickFileTarget,
@@ -15,6 +16,7 @@ import {
   readLinuxClipboard,
   stagedImageName,
   targetsCommand,
+  toolFor,
 } from '../clipboard/linux';
 import { silentLogger } from '../log';
 
@@ -94,6 +96,13 @@ test('fileUriToPath handles the localhost form and rejects the rest', () => {
   assert.equal(fileUriToPath('file://'), undefined);
 });
 
+test('each backend knows its tool and the package that provides it', () => {
+  assert.equal(toolFor('wayland'), 'wl-paste');
+  assert.equal(packageFor('wayland'), 'wl-clipboard');
+  assert.equal(toolFor('x11'), 'xclip');
+  assert.equal(packageFor('x11'), 'xclip');
+});
+
 test('staged image names match what the TTL sweeper looks for', () => {
   const name = stagedImageName(new Date(2026, 7, 24, 9, 5, 3, 7));
   assert.equal(name, 'clipboard-20260824-090503-007.png');
@@ -116,5 +125,33 @@ test('with no display, the reader says so and marks it actionable', async () => 
     }
   } finally {
     await fs.rm(stagingDir, { recursive: true, force: true });
+  }
+});
+
+test('a missing tool is reported with the package that would fix it', async () => {
+  // Pointed at a PATH with no clipboard tools at all: the reader must describe
+  // the fix rather than just failing, so the UI can offer to install it.
+  const stagingDir = await fs.mkdtemp(path.join(os.tmpdir(), 'pasteport-staging-test-'));
+  const emptyBinDir = await fs.mkdtemp(path.join(os.tmpdir(), 'pasteport-nobin-'));
+  const realPath = process.env['PATH'];
+  process.env['PATH'] = emptyBinDir;
+
+  try {
+    const content = await readLinuxClipboard({
+      stagingDir,
+      log: silentLogger,
+      env: { WAYLAND_DISPLAY: 'wayland-0' },
+    });
+
+    assert.equal(content.kind, 'error');
+    if (content.kind === 'error') {
+      assert.equal(content.actionable, true);
+      assert.match(content.message, /wl-paste is not installed/);
+      assert.deepEqual(content.remedy, { kind: 'installPackages', packages: ['wl-clipboard'] });
+    }
+  } finally {
+    process.env['PATH'] = realPath;
+    await fs.rm(stagingDir, { recursive: true, force: true });
+    await fs.rm(emptyBinDir, { recursive: true, force: true });
   }
 });

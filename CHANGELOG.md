@@ -26,8 +26,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Windows client support: a PowerShell reader taking the PNG clipboard flavour when present and the
   bitmap otherwise, bound to <kbd>Ctrl</kbd>+<kbd>V</kbd>.
 - Linux client support: `wl-paste` on Wayland and `xclip` on X11, handling `text/uri-list` and
-  `x-special/gnome-copied-files`, bound to <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd>. Says which
-  package to install when neither tool is present.
+  `x-special/gnome-copied-files`, bound to <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd>.
+- When the Linux clipboard tool is missing, an offer to install it: the command is shown before it
+  runs, elevation goes through `pkexec` so the desktop prompts for authentication, and unsupported or
+  source-based distributions are told what to run instead of having something guessed for them.
 - `pasteport.paste` is contributed to `terminal.integrated.commandsToSkipShell`, without which the
   paste key on Windows is delivered to the shell and never reaches the extension.
 - An extension icon, rasterised from `assets/icon.svg` at package time by `scripts/build.mjs`; no

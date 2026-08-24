@@ -80,11 +80,14 @@ export function readCommand(backend: LinuxBackend, target: string): [string, str
     : ['xclip', ['-selection', 'clipboard', '-t', target, '-o']];
 }
 
-/** Package name to suggest when the tool for a backend is absent. */
-export function installHint(backend: LinuxBackend): string {
-  return backend === 'wayland'
-    ? 'wl-paste is missing — install wl-clipboard (for example: apt install wl-clipboard)'
-    : 'xclip is missing — install xclip (for example: apt install xclip)';
+/** Distribution package that provides each backend's tool. */
+export function packageFor(backend: LinuxBackend): string {
+  return backend === 'wayland' ? 'wl-clipboard' : 'xclip';
+}
+
+/** Tool this extension invokes for each backend. */
+export function toolFor(backend: LinuxBackend): string {
+  return backend === 'wayland' ? 'wl-paste' : 'xclip';
 }
 
 export function parseTargets(stdout: string): string[] {
@@ -191,7 +194,7 @@ export async function readLinuxClipboard(options: LinuxReaderOptions): Promise<C
     };
   }
 
-  const missing: string[] = [];
+  const missingBackends: LinuxBackend[] = [];
   let lastTargets: string[] = [];
 
   for (const backend of backends) {
@@ -200,7 +203,7 @@ export async function readLinuxClipboard(options: LinuxReaderOptions): Promise<C
     const listed = await run(command, args, MAX_TARGETS_BYTES);
 
     if (listed.status === 'missing') {
-      missing.push(installHint(backend));
+      missingBackends.push(backend);
       continue;
     }
     if (listed.status === 'failed') {
@@ -219,8 +222,18 @@ export async function readLinuxClipboard(options: LinuxReaderOptions): Promise<C
     if (content !== undefined) return content;
   }
 
-  if (missing.length === backends.length && missing.length > 0) {
-    return { kind: 'error', actionable: true, message: missing.join('; ') };
+  // Every backend this session could use is unavailable, so the clipboard is
+  // unreachable until something is installed. The reader states which package
+  // would fix it; whether to offer that is the UI layer's call.
+  if (missingBackends.length > 0 && missingBackends.length === backends.length) {
+    const tools = missingBackends.map(toolFor).join(' or ');
+    const packages = [...new Set(missingBackends.map(packageFor))];
+    return {
+      kind: 'error',
+      actionable: true,
+      message: `${tools} is not installed, so the clipboard cannot be read`,
+      remedy: { kind: 'installPackages', packages },
+    };
   }
 
   return { kind: 'other', types: lastTargets };

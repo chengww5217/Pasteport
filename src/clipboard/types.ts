@@ -32,6 +32,17 @@ export interface ClipboardOther {
   types: string[];
 }
 
+/**
+ * A fix the extension knows how to carry out, described by the reader rather
+ * than performed by it: the reader knows what is missing, the UI layer decides
+ * how to ask.
+ */
+export interface InstallPackagesRemedy {
+  kind: 'installPackages';
+  /** Distribution package names, identical across the mainstream distros. */
+  packages: string[];
+}
+
 export interface ClipboardError {
   kind: 'error';
   message: string;
@@ -41,6 +52,7 @@ export interface ClipboardError {
    * the user just pressed a key and nothing happened.
    */
   actionable?: boolean;
+  remedy?: InstallPackagesRemedy;
 }
 
 export type ClipboardContent = ClipboardFiles | ClipboardImage | ClipboardOther | ClipboardError;

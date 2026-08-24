@@ -4,8 +4,10 @@ import * as path from 'node:path';
 import * as vscode from 'vscode';
 
 import type { ClipboardContent, ClipboardReader } from './clipboard';
+import type { ClipboardError } from './clipboard/types';
 import type { PasteportConfig } from './config';
 import { formatBytes } from './format';
+import { offerPackageInstall } from './install';
 import { describeError, type Logger } from './log';
 import { formatPathsForTerminal } from './quoting';
 import { isWritableRemote, remoteTemplateUri } from './remote/target';
@@ -58,7 +60,7 @@ export async function paste(deps: PasteDependencies): Promise<void> {
   if (payload === undefined) {
     log.debug(`nothing to transfer (${summarize(content)}), passing the paste through`);
     if (content.kind === 'error' && content.actionable === true) {
-      notifyActionableOnce(content.message, log);
+      notifyActionableOnce(content, log);
     }
     return passThroughPaste(log);
   }
@@ -213,13 +215,22 @@ function unique(paths: readonly string[]): string[] {
  */
 const notifiedActionable = new Set<string>();
 
-function notifyActionableOnce(message: string, log: Logger): void {
-  if (notifiedActionable.has(message)) return;
-  notifiedActionable.add(message);
+function notifyActionableOnce(error: ClipboardError, log: Logger): void {
+  if (notifiedActionable.has(error.message)) return;
+  notifiedActionable.add(error.message);
 
-  void vscode.window.showWarningMessage(`Pasteport: ${message}`, 'Show Log').then((choice) => {
-    if (choice === 'Show Log') log.show(true);
-  });
+  // A problem with a known fix gets the fix offered; everything else gets the
+  // log, which is all we can honestly do about it.
+  if (error.remedy?.kind === 'installPackages') {
+    void offerPackageInstall(error.remedy.packages, error.message, log);
+    return;
+  }
+
+  void vscode.window
+    .showWarningMessage(`Pasteport: ${error.message}`, 'Show Log')
+    .then((choice) => {
+      if (choice === 'Show Log') log.show(true);
+    });
 }
 
 function showFailure(message: string, log: Logger): void {

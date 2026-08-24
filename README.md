@@ -32,8 +32,9 @@ Multiple files are inserted space-separated, with a trailing space so you can ke
   native clipboard there. Each platform has its own reader; see
   [Platform support](#platform-support) for what has been verified on real hardware.
 - **On Linux only, a clipboard tool:** `wl-clipboard` for Wayland or `xclip` for X11. Neither is
-  bundled, and if both are missing the extension says which one to install rather than failing
-  silently.
+  bundled. If it is missing, the first paste offers to install it: the exact command is shown first,
+  and your desktop asks for authentication through its own polkit prompt. Declining leaves you with
+  the command to run yourself.
 - **VS Code 1.85 or later**, and a remote window (the local window is not the target scenario).
 - Nothing to install on the remote host.
 
