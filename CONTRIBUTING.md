@@ -7,6 +7,7 @@ are especially useful — that command prints every condition a successful paste
 
 ```sh
 npm install
+npm run build       # assets/icon.svg -> dist/icon.png, README.md -> dist/README.md
 npm run compile     # tsc, strict
 npm run lint        # eslint, type-aware rules
 npm run format      # prettier --check (use format:write to fix)
@@ -34,6 +35,23 @@ To package:
 ```sh
 npm run package     # produces pasteport.vsix
 ```
+
+## The icon
+
+`assets/icon.svg` is the source of truth and the only icon file in the repository.
+`scripts/build.mjs` produces the two things vsce needs that are not source files, both into `dist/`
+and neither committed:
+
+- **`dist/icon.png`** — 256×256, because the Marketplace and the Extensions view accept raster
+  icons only. Edit the SVG; the PNG is disposable.
+- **`dist/README.md`** — a copy of `README.md` with the `<!-- icon:begin -->` block removed. vsce
+  refuses an SVG anywhere in a README, and the Marketplace renders the icon in the page header
+  anyway, so the image is shown on GitHub and left out of the package. `npm run package` passes
+  `--readme-path dist/README.md`; keep that flag on any hand-rolled vsce invocation, and note that
+  `README.md` itself is in `.vscodeignore` so the two copies cannot collide.
+
+The SVG contains no `<text>`, and the renderer runs with system fonts disabled, so the PNG is
+identical on every machine.
 
 ## Architecture in one paragraph
 

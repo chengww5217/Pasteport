@@ -23,6 +23,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `Pasteport: Diagnose`, which reports every condition a successful paste depends on.
 - Settings: `remoteDir`, `quoting`, `trailingSpace`, `confirmAboveSeconds`, `ttlHours`,
   `bracketedPaste`.
+- An extension icon, rasterised from `assets/icon.svg` at package time by `scripts/build.mjs`; no
+  image is committed.
 
 ### Known limitations
 

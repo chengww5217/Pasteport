@@ -1,10 +1,20 @@
 .vscode/**
 .github/**
+assets/**
+scripts/**
 out/**
 src/**
 dist/test/**
 dist/**/*.map
+
+# the packaged readme is dist/README.md (see --readme-path); excluding the original
+# keeps it from colliding with the copy vsce adds as readme.md
+README.md
+dist/README.md
+
 node_modules/**
+.gitignore
+.prettierignore
 .eslintrc.json
 .prettierrc.json
 .editorconfig

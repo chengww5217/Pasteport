@@ -1,5 +1,9 @@
 # Pasteport
 
+<!-- icon:begin — stripped from the packaged README by scripts/build.mjs; vsce rejects SVG -->
+<img src="assets/icon.svg" alt="Pasteport icon" width="116" align="right" />
+<!-- icon:end -->
+
 Press <kbd>Cmd</kbd>+<kbd>V</kbd> in the terminal of a VS Code **remote window** and the image or
 files on your Mac's clipboard are sent to the remote host — then the **remote path** is typed into
 your prompt, ready for a CLI agent to read.

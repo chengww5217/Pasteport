@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="Pasteport">
+  <defs>
+    <linearGradient id="host" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0" stop-color="#3A4459" />
+      <stop offset="1" stop-color="#1B2130" />
+    </linearGradient>
+    <linearGradient id="paper" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" />
+      <stop offset="1" stop-color="#DDE4EE" />
+    </linearGradient>
+    <linearGradient id="shot" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#CFE3FF" />
+      <stop offset="1" stop-color="#7FB0F2" />
+    </linearGradient>
+    <filter id="lift" x="-30%" y="-30%" width="170%" height="170%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3.5" flood-color="#0B1220" flood-opacity="0.45" />
+    </filter>
+  </defs>
+
+  <!-- the remote host: a terminal, waiting at the far end of the link -->
+  <g>
+    <rect x="10" y="46" width="108" height="70" rx="11" fill="url(#host)" />
+    <rect
+      x="11.25"
+      y="47.25"
+      width="105.5"
+      height="67.5"
+      rx="9.75"
+      fill="none"
+      stroke="#8794AC"
+      stroke-width="2.5"
+      opacity="0.5"
+    />
+    <path
+      d="M24 84 L33 93 L24 102"
+      fill="none"
+      stroke="#5FE3A1"
+      stroke-width="6"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <rect x="42" y="86" width="9" height="16" rx="2.5" fill="#5FE3A1" opacity="0.85" />
+  </g>
+
+  <!-- one hop across the link, gathering speed -->
+  <g fill="#79B4FF">
+    <circle cx="12" cy="43" r="2" opacity="0.4" />
+    <circle cx="15" cy="30" r="2.5" opacity="0.55" />
+    <circle cx="23" cy="21" r="3" opacity="0.7" />
+    <circle cx="34" cy="15" r="3.5" opacity="0.85" />
+  </g>
+
+  <!-- what arrives: a document, and a screenshot on top of it -->
+  <g filter="url(#lift)">
+    <g transform="rotate(-17 70 40)">
+      <path
+        d="M46 18 h22 l14 14 v34 a5 5 0 0 1 -5 5 H51 a5 5 0 0 1 -5 -5 V23 a5 5 0 0 1 5 -5 z"
+        fill="url(#paper)"
+      />
+      <path d="M68 18 l14 14 H73 a5 5 0 0 1 -5 -5 z" fill="#9CAAC0" />
+    </g>
+    <g transform="rotate(7 84 56)">
+      <rect x="60" y="34" width="50" height="44" rx="6" fill="url(#paper)" />
+      <rect x="66" y="40" width="38" height="32" rx="3" fill="url(#shot)" />
+      <circle cx="75" cy="48" r="4" fill="#FFFFFF" />
+      <path d="M66 72 V65 L79 52 L90 63 L95 58 L104 67 V72 Z" fill="#2249B8" />
+    </g>
+  </g>
+</svg>

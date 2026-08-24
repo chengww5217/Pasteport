@@ -15,6 +15,7 @@
   "engines": {
     "vscode": "^1.85.0"
   },
+  "icon": "dist/icon.png",
   "categories": [
     "Other"
   ],
@@ -118,16 +119,18 @@
     }
   },
   "scripts": {
+    "build": "node scripts/build.mjs",
     "compile": "tsc -p ./",
     "watch": "tsc -p ./ -w",
     "lint": "eslint src --ext ts",
     "format": "prettier --check .",
     "format:write": "prettier --write .",
     "test": "npm run compile && node --test dist/test/*.test.js",
-    "package": "npm run compile && npx --yes @vscode/vsce package -o pasteport.vsix",
-    "vscode:prepublish": "npm run compile"
+    "package": "npx --yes @vscode/vsce package --readme-path dist/README.md -o pasteport.vsix",
+    "vscode:prepublish": "npm run build && npm run compile"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "2.6.2",
     "@types/node": "20.11.30",
     "@types/vscode": "1.85.0",
     "@typescript-eslint/eslint-plugin": "7.18.0",
