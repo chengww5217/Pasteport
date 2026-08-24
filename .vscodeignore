@@ -1,0 +1,14 @@
+.vscode/**
+.github/**
+out/**
+src/**
+dist/test/**
+dist/**/*.map
+node_modules/**
+.eslintrc.json
+.prettierrc.json
+.editorconfig
+tsconfig.json
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+*.vsix

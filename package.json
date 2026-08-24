@@ -1,0 +1,51 @@
+{
+  "name": "pasteport",
+  "displayName": "Pasteport",
+  "description": "Paste images and files from your local clipboard into a remote terminal — the remote path lands in the prompt, ready for a CLI agent to read.",
+  "version": "0.0.1",
+  "publisher": "chengww5217",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chengww5217/pasteport.git"
+  },
+  "bugs": {
+    "url": "https://github.com/chengww5217/pasteport/issues"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "remote",
+    "clipboard",
+    "paste",
+    "terminal",
+    "ssh"
+  ],
+  "extensionKind": [
+    "ui"
+  ],
+  "main": "./dist/extension.js",
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -p ./ -w",
+    "lint": "eslint src --ext ts",
+    "format": "prettier --check .",
+    "format:write": "prettier --write .",
+    "test": "npm run compile && node --test dist/test/",
+    "package": "npm run compile && npx --yes @vscode/vsce package -o pasteport.vsix",
+    "vscode:prepublish": "npm run compile"
+  },
+  "devDependencies": {
+    "@types/node": "20.11.30",
+    "@types/vscode": "1.85.0",
+    "@typescript-eslint/eslint-plugin": "7.18.0",
+    "@typescript-eslint/parser": "7.18.0",
+    "eslint": "8.57.1",
+    "prettier": "3.3.3",
+    "typescript": "5.5.4"
+  }
+}

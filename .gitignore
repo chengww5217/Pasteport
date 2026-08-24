@@ -1,0 +1,12 @@
+# --- build output; also holds internal design docs and spikes, intentionally untracked ---
+out/
+dist/
+*.vsix
+
+# --- dependencies ---
+node_modules/
+
+# --- editor / OS ---
+.DS_Store
+.vscode-test/
+*.log
