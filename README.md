@@ -4,13 +4,13 @@
 <img src="assets/icon.svg" alt="Pasteport icon" width="116" align="right" />
 <!-- icon:end -->
 
-Press <kbd>Cmd</kbd>+<kbd>V</kbd> in the terminal of a VS Code **remote window** and the image or
-files on your Mac's clipboard are sent to the remote host — then the **remote path** is typed into
-your prompt, ready for a CLI agent to read.
+Press the paste key in the terminal of a VS Code **remote window** and the image or files on your
+local clipboard are sent to the remote host — then the **remote path** is typed into your prompt,
+ready for a CLI agent to read.
 
 ```
 $ claude "what is wrong in this screenshot?" /tmp/pasteport/9f2c1a4b7e0d3856/clipboard.png
-                                             └── appeared when you pressed Cmd+V
+                                             └── appeared when you pressed paste
 ```
 
 Nothing changes in a local window: the keystroke is passed straight through to the terminal, so
@@ -18,20 +18,22 @@ you can leave the keybinding in place everywhere.
 
 ## What it handles
 
-| Clipboard contents                        | Result                                              |
-| ----------------------------------------- | --------------------------------------------------- |
-| Screenshot or copied image                | Staged as PNG, uploaded, remote path inserted       |
-| One or more files copied in Finder        | Uploaded under their original names, paths inserted |
-| Text, an empty clipboard, a copied folder | Nothing happens — the normal terminal paste runs    |
+| Clipboard contents                           | Result                                              |
+| -------------------------------------------- | --------------------------------------------------- |
+| Screenshot or copied image                   | Staged as PNG, uploaded, remote path inserted       |
+| One or more files copied in the file manager | Uploaded under their original names, paths inserted |
+| Text, an empty clipboard, a copied folder    | Nothing happens — the normal terminal paste runs    |
 
 Multiple files are inserted space-separated, with a trailing space so you can keep typing.
 
 ## Requirements
 
-- **macOS client.** The extension runs on your local machine and reads the native pasteboard, and
-  only the macOS reader ships today. On Windows and Linux clients it stays out of the way entirely:
-  no key is bound, so pasting behaves exactly as it did before. Readers for both are planned — see
-  [Platform support](#platform-support).
+- **A macOS, Windows or Linux client.** The extension runs on your local machine and reads the
+  native clipboard there. Each platform has its own reader; see
+  [Platform support](#platform-support) for what has been verified on real hardware.
+- **On Linux only, a clipboard tool:** `wl-clipboard` for Wayland or `xclip` for X11. Neither is
+  bundled, and if both are missing the extension says which one to install rather than failing
+  silently.
 - **VS Code 1.85 or later**, and a remote window (the local window is not the target scenario).
 - Nothing to install on the remote host.
 
@@ -54,18 +56,20 @@ and exercised. Reports from the other backends are welcome.
 ## How it works
 
 The extension is declared `"extensionKind": ["ui"]`, which means it runs in the **local** extension
-host on your Mac rather than on the remote host. Two consequences follow, and they are the reason
-the extension is built this way:
+host on your own machine rather than on the remote host. Two consequences follow, and they are the
+reason the extension is built this way:
 
-- **It reads the real pasteboard.** Files copied in Finder appear on the pasteboard as file URLs,
-  which is a flavour the asynchronous clipboard API in a webview never exposes. Reading AppKit
-  directly is what makes "copy a file in Finder, paste it in the terminal" work at all.
+- **It reads the real clipboard.** Files copied in Finder or Explorer appear on the clipboard as
+  file URLs — a flavour the asynchronous clipboard API in a webview never exposes. Reading the
+  native clipboard directly is what makes "copy a file, paste it in the terminal" work at all.
 - **Bytes take one hop.** The file is read from local disk and written through VS Code's existing
   channel. There is no base64 round trip through an RPC boundary, so there is no size ceiling
   beyond patience and remote disk space.
 
-The clipboard read itself is an `osascript` (JXA) call into AppKit, measured at about **30ms** —
-below the threshold where a keystroke starts to feel delayed.
+The clipboard read runs on every paste, including plain-text ones, so its cost is felt as input
+latency. On macOS it is an `osascript` (JXA) call into AppKit, measured at about **30ms** — below the
+threshold where a keystroke starts to feel delayed. If a probe ever exceeds 150ms the extension logs
+a warning, since that is the point at which the reader would need to become a resident process.
 
 ### Why not scp
 
@@ -142,24 +146,39 @@ today. Choose `shell` if you mainly paste into a shell that will parse the line.
 
 ## Keybinding
 
-<kbd>Cmd</kbd>+<kbd>V</kbd> is bound on macOS, while the terminal has focus. It matches the
-terminal's own paste binding, so the key keeps doing what it always did unless there is an image or
-a file on the clipboard.
+Each platform's own terminal paste key is used, and only while the terminal has focus. The key
+keeps doing what it always did unless there is an image or a file on the clipboard.
 
-**No key is bound on Windows or Linux.** Each platform's binding arrives with its reader: claiming
-the key earlier would shadow the terminal's own paste and leave those platforms worse off than
-without the extension installed. On Linux the binding will be
-<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd> — <kbd>Ctrl</kbd>+<kbd>V</kbd> is `quoted-insert` in
-readline and will be left alone.
+| Platform | Key                                           | Note                                                                                                          |
+| -------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| macOS    | <kbd>Cmd</kbd>+<kbd>V</kbd>                   | —                                                                                                             |
+| Windows  | <kbd>Ctrl</kbd>+<kbd>V</kbd>                  | —                                                                                                             |
+| Linux    | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd> | Matches the terminal convention; <kbd>Ctrl</kbd>+<kbd>V</kbd> is readline's `quoted-insert` and is left alone |
+
+On Windows and Linux a key pressed in a focused terminal is normally sent straight to the shell, so
+`pasteport.paste` is added to `terminal.integrated.commandsToSkipShell` — that list is additive on
+top of VS Code's built-in one, so nothing you already rely on changes. If you have your own
+`commandsToSkipShell` array in your settings, it replaces the default and the extension offers to
+add the entry for you once.
 
 To use a different key, rebind `pasteport.paste` in your keyboard shortcuts.
 
 ## Platform support
 
-The macOS, Windows and Linux readers are three separate programs — JXA on macOS, PowerShell on
-Windows, `wl-paste`/`xclip` on Linux — with no code in common beyond a small JSON contract. The
-macOS reader is implemented; the other two are next, along with verification of the remaining
-remote backends.
+The three readers are separate programs with no code in common beyond a small JSON contract, because
+the platform APIs have nothing in common either.
+
+| Client  | Reader                                      | Status                                                                 |
+| ------- | ------------------------------------------- | ---------------------------------------------------------------------- |
+| macOS   | `osascript` (JXA) into AppKit               | Verified on real hardware: screenshots, TIFF-only copies, Finder files |
+| Windows | `powershell -STA` into System.Windows.Forms | Runs in CI on a Windows runner; not yet exercised on a real desktop    |
+| Linux   | `wl-paste` (Wayland) / `xclip` (X11)        | Format handling is unit tested; not yet exercised on a real desktop    |
+
+Two things are honestly unmeasured. PowerShell starts an order of magnitude more slowly than
+`osascript`, and that cost lands on every paste; the extension logs a warning above 150ms, so if
+Windows input feels sluggish the log will say so and the reader will need to become a resident
+process. And neither the Windows nor the Linux reader has been driven by a human on a real desktop
+session yet — reports are welcome.
 
 ## Contributing
 

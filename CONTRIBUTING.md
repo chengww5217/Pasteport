@@ -82,18 +82,24 @@ readers share no code — the platform APIs have nothing in common — only the 
 by path, so bundling it would defeat the point. `media/` would be the wrong home for the same
 reason — by convention that directory holds webview assets, and this extension has no webview.
 
-## Before re-adding the Windows or Linux keybinding
+## How the terminal keybindings work
 
-Only <kbd>Cmd</kbd>+<kbd>V</kbd> is contributed, and that is not an oversight. When the terminal has
-focus, a key event reaches the workbench only if xterm.js declines to consume it, or if the command
-it resolves to is in `terminal.integrated.commandsToSkipShell`. On macOS xterm.js maps no
-<kbd>Cmd</kbd> combination to terminal input except <kbd>Cmd</kbd>+<kbd>A</kbd>, so the event bubbles
-up and the command runs. <kbd>Ctrl</kbd>+<kbd>V</kbd> is different: xterm.js turns it into `^V` and
-consumes it, so binding it would replace the working built-in paste with nothing at all — an
-extension keybinding outranks the core one, and `pasteport.paste` is not in the skip list.
+Each platform binds its own paste key, and the mechanism behind that is worth knowing before
+changing any of it. A key pressed while the terminal has focus reaches the workbench only if
+xterm.js declines to consume it, or if the command it resolves to is listed in
+`terminal.integrated.commandsToSkipShell`.
 
-So a platform binding needs three things, in this order: a reader, a verified key event that
-actually reaches the command, and only then the manifest entry.
+- macOS: xterm.js maps no <kbd>Cmd</kbd> combination to terminal input except
+  <kbd>Cmd</kbd>+<kbd>A</kbd>, so <kbd>Cmd</kbd>+<kbd>V</kbd> bubbles up on its own.
+- Windows: xterm.js turns <kbd>Ctrl</kbd>+<kbd>V</kbd> into `^V` and consumes it, so the binding
+  only works because `pasteport.paste` is contributed to `commandsToSkipShell`. Contributing to that
+  list is safe — VS Code concatenates the configured value onto a hardcoded default list, so nothing
+  existing is displaced — but a user who has their own array in settings.json replaces the default
+  outright, which `src/skipShell.ts` detects and offers to fix.
+
+An extension keybinding outranks the built-in terminal paste, so any binding added here must keep
+the pass-through path working: if the clipboard holds no image or file, `pasteport.paste` has to
+behave exactly like the paste it displaced.
 
 ## Commits
 

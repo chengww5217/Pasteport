@@ -23,6 +23,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `Pasteport: Diagnose`, which reports every condition a successful paste depends on.
 - Settings: `remoteDir`, `quoting`, `trailingSpace`, `confirmAboveSeconds`, `ttlHours`,
   `bracketedPaste`.
+- Windows client support: a PowerShell reader taking the PNG clipboard flavour when present and the
+  bitmap otherwise, bound to <kbd>Ctrl</kbd>+<kbd>V</kbd>.
+- Linux client support: `wl-paste` on Wayland and `xclip` on X11, handling `text/uri-list` and
+  `x-special/gnome-copied-files`, bound to <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd>. Says which
+  package to install when neither tool is present.
+- `pasteport.paste` is contributed to `terminal.integrated.commandsToSkipShell`, without which the
+  paste key on Windows is delivered to the shell and never reaches the extension.
 - An extension icon, rasterised from `assets/icon.svg` at package time by `scripts/build.mjs`; no
   image is committed.
 - Packaging through esbuild: the extension ships as one minified `dist/extension.js`, and the vsix
@@ -30,10 +37,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Known limitations
 
-- macOS clients only, and <kbd>Cmd</kbd>+<kbd>V</kbd> is bound only there. No key is bound on
-  Windows or Linux, so pasting on those clients is untouched until their readers land.
-- Only Remote - SSH has been verified; Dev Containers, WSL and Tunnels use the same code path but
-  have not been exercised yet.
+- The Windows and Linux readers have not been exercised on a real desktop session yet; both are
+  covered by unit tests, and the Windows one runs against a real PowerShell in CI.
+- PowerShell's startup cost is unmeasured on real hardware. It lands on every paste, including
+  plain-text ones; the extension logs a warning if a probe exceeds 150ms.
+- Only Remote - SSH has been verified as a backend; Dev Containers, WSL and Tunnels use the same code
+  path but have not been exercised yet.
 - `quoting: auto` inserts paths verbatim while quote handling in TUI agents is unverified.
 - A transfer already in flight cannot be interrupted mid-file: `workspace.fs.writeFile` has no
   cancellation point, so cancelling stops the transfer between files.
