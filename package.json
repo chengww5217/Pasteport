@@ -3,7 +3,7 @@
   "displayName": "Pasteport",
   "description": "Paste images and files from your local clipboard into a remote terminal — the remote path lands in the prompt, ready for a CLI agent to read.",
   "version": "0.0.1",
-  "publisher": "chengww5217",
+  "publisher": "chengww",
   "license": "MIT",
   "repository": {
     "type": "git",
