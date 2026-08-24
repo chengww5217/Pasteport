@@ -15,7 +15,7 @@ test('shellQuote wraps anything else', () => {
     "'/tmp/x/Screenshot 2026-08-24 at 10.28.15.png'"
   );
   assert.equal(shellQuote('/tmp/x/$(whoami).png'), "'/tmp/x/$(whoami).png'");
-  assert.equal(shellQuote('/tmp/x/名前.png'), "'/tmp/x/名前.png'");
+  assert.equal(shellQuote('/tmp/x/截图.png'), "'/tmp/x/截图.png'");
   assert.equal(shellQuote(''), "''");
 });
 

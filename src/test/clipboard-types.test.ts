@@ -28,6 +28,16 @@ test('ignores interpreter noise around the JSON object', () => {
   assert.deepEqual(parseClipboardPayload(noisy), { kind: 'other', types: [] });
 });
 
+test('parses a Windows payload with escaped separators and \\u escapes', () => {
+  // The PowerShell reader emits ASCII-only JSON so the console code page cannot
+  // corrupt a name, which means both of these escapes are the normal case there.
+  const raw = '{"kind":"files","paths":["C:\\\\Users\\\\me\\\\\\u5c4f\\u5e55\\u622a\\u56fe.png"]}';
+  assert.deepEqual(parseClipboardPayload(raw), {
+    kind: 'files',
+    paths: ['C:\\Users\\me\\屏幕截图.png'],
+  });
+});
+
 test('malformed output degrades to an error value, never a throw', () => {
   for (const raw of ['', '   ', 'not json at all', '{"kind":', '[]', '{"kind":"weird"}']) {
     const result = parseClipboardPayload(raw);

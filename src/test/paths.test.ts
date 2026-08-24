@@ -48,7 +48,7 @@ test('sanitizeFileName keeps names the remote side never re-parses', () => {
     sanitizeFileName('Screenshot 2026-08-24 at 10.28.15.png'),
     'Screenshot 2026-08-24 at 10.28.15.png'
   );
-  assert.equal(sanitizeFileName('スクリーンショット.png'), 'スクリーンショット.png');
+  assert.equal(sanitizeFileName('屏幕截图 2026-08-24.png'), '屏幕截图 2026-08-24.png');
   assert.equal(sanitizeFileName("it's a $(shot).png"), "it's a $(shot).png");
 });
 
@@ -76,11 +76,11 @@ test('sanitizeFileName truncates the stem and preserves the extension', () => {
 });
 
 test('sanitizeFileName truncates multi-byte names on character boundaries', () => {
-  const result = sanitizeFileName(`${'あ'.repeat(200)}.png`);
+  const result = sanitizeFileName(`${'截'.repeat(200)}.png`);
 
   assert.ok(Buffer.byteLength(result) <= 200);
   assert.ok(!result.includes('\ufffd'));
-  assert.equal(result, `${'あ'.repeat(65)}.png`);
+  assert.equal(result, `${'截'.repeat(65)}.png`);
 });
 
 test('remote paths put the fingerprint in a directory of its own', () => {

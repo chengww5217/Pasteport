@@ -125,7 +125,7 @@
     "lint": "eslint src --ext ts",
     "format": "prettier --check .",
     "format:write": "prettier --write .",
-    "test": "npm run compile && node --test out/test/*.test.js",
+    "test": "npm run compile && node --test \"out/test/*.test.js\"",
     "package": "npx --yes @vscode/vsce package --readme-path dist/README.md -o out/pasteport.vsix",
     "vscode:prepublish": "npm run compile && npm run build"
   },

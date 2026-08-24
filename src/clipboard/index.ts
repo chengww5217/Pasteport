@@ -5,6 +5,7 @@ import * as path from 'node:path';
 import { describeError, type Logger } from '../log';
 import { readDarwinClipboard } from './darwin';
 import type { ClipboardContent } from './types';
+import { readWin32Clipboard } from './win32';
 
 export type { ClipboardContent } from './types';
 
@@ -32,28 +33,48 @@ export interface ReaderContext {
 
 /**
  * Returns the reader for the current client platform, or undefined where none
- * exists yet (Windows: M3, Linux: M4).
+ * exists (Linux arrives with its own reader; see linux.ts).
  *
  * Undefined is a supported state, not an error: the caller falls through to the
- * built-in terminal paste, so on an unsupported platform Cmd+V keeps behaving
- * exactly as it did before the extension was installed.
+ * built-in terminal paste, so on an unsupported platform the paste key keeps
+ * behaving exactly as it did before the extension was installed.
  */
 export function createClipboardReader(context: ReaderContext): ClipboardReader | undefined {
-  if (process.platform !== 'darwin') return undefined;
+  const read = platformRead(context);
+  if (read === undefined) return undefined;
 
-  // Readers ship as plain files under resources/ rather than being bundled: this
-  // one is handed to osascript by path, never required.
-  const scriptPath = path.join(context.extensionPath, 'resources', 'clipboard-read.darwin.js');
   return {
-    read: async (): Promise<ClipboardContent> => {
-      const content = await readDarwinClipboard({
-        scriptPath,
-        stagingDir: STAGING_DIR,
-        log: context.log,
-      });
-      return keepOnlyRegularFiles(content, context.log);
-    },
+    read: async (): Promise<ClipboardContent> => keepOnlyRegularFiles(await read(), context.log),
   };
+}
+
+/**
+ * Readers ship as plain files under resources/ rather than being bundled: each
+ * is handed to its interpreter by path, never required.
+ */
+function platformRead(context: ReaderContext): (() => Promise<ClipboardContent>) | undefined {
+  const resource = (name: string): string => path.join(context.extensionPath, 'resources', name);
+
+  switch (process.platform) {
+    case 'darwin':
+      return () =>
+        readDarwinClipboard({
+          scriptPath: resource('clipboard-read.darwin.js'),
+          stagingDir: STAGING_DIR,
+          log: context.log,
+        });
+
+    case 'win32':
+      return () =>
+        readWin32Clipboard({
+          scriptPath: resource('clipboard-read.win32.ps1'),
+          stagingDir: STAGING_DIR,
+          log: context.log,
+        });
+
+    default:
+      return undefined;
+  }
 }
 
 /**
@@ -89,7 +110,7 @@ export async function keepOnlyRegularFiles(
     if (content.kind === 'image') {
       return { kind: 'error', message: 'reader staged an image that is no longer readable' };
     }
-    return { kind: 'other', types: ['public.file-url (no regular files)'] };
+    return { kind: 'other', types: ['file list (no regular files)'] };
   }
 
   return content.kind === 'files' ? { kind: 'files', paths: kept } : { kind: 'image', paths: kept };
