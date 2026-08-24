@@ -97,7 +97,8 @@ async function cleanUp(log: Logger, interactive: boolean): Promise<void> {
   if (template === undefined) {
     if (interactive) {
       void vscode.window.showInformationMessage(
-        `Pasteport: not a remote window; removed ${staging.removed} staged file(s) locally.`
+        `Pasteport: removed ${staging.removed} staged file(s) locally. ` +
+          'No remote target could be resolved in this window, so nothing was swept remotely.'
       );
     }
     return;

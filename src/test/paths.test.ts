@@ -34,6 +34,15 @@ test('normalizeRemoteDir rejects the filesystem root', () => {
   assert.throws(() => normalizeRemoteDir('///'), /below the filesystem root/);
 });
 
+test('normalizeRemoteDir rejects dot segments that lead back to the root', () => {
+  assert.throws(() => normalizeRemoteDir('/..'), /"\." or "\.\."/);
+  assert.throws(() => normalizeRemoteDir('/tmp/..'), /"\." or "\.\."/);
+  assert.throws(() => normalizeRemoteDir('/./'), /"\." or "\.\."/);
+  assert.throws(() => normalizeRemoteDir('/tmp/../../etc'), /"\." or "\.\."/);
+  // A leading dot in a real directory name is fine.
+  assert.equal(normalizeRemoteDir('/home/me/.cache/pasteport'), '/home/me/.cache/pasteport');
+});
+
 test('sanitizeFileName keeps names the remote side never re-parses', () => {
   assert.equal(
     sanitizeFileName('Screenshot 2026-08-24 at 10.28.15.png'),

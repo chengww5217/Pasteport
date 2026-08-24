@@ -305,7 +305,12 @@ export class TransferService {
 
   private recordSample(bytes: number, elapsedMs: number): void {
     if (!this.estimator.observe(bytes, elapsedMs)) {
-      this.log.trace(`rate sample ignored (${bytes} bytes < ${MIN_SAMPLE_BYTES} minimum)`);
+      // Either too small to say anything about bandwidth, or so fast that the
+      // millisecond clock reported zero — both are uninformative.
+      this.log.trace(
+        `rate sample ignored: ${bytes} bytes in ${elapsedMs}ms ` +
+          `(needs >= ${MIN_SAMPLE_BYTES} bytes and > 0ms)`
+      );
       return;
     }
     this.store.write(this.estimator.bytesPerSecond);

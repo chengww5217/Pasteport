@@ -47,6 +47,19 @@ Adding a reader for another platform means writing a new program that emits the 
 (see `src/clipboard/types.ts`) plus a thin host wrapper alongside `src/clipboard/darwin.ts`. The
 readers share no code — the platform APIs have nothing in common — only the contract.
 
+## Before re-adding the Windows or Linux keybinding
+
+Only <kbd>Cmd</kbd>+<kbd>V</kbd> is contributed, and that is not an oversight. When the terminal has
+focus, a key event reaches the workbench only if xterm.js declines to consume it, or if the command
+it resolves to is in `terminal.integrated.commandsToSkipShell`. On macOS xterm.js maps no
+<kbd>Cmd</kbd> combination to terminal input except <kbd>Cmd</kbd>+<kbd>A</kbd>, so the event bubbles
+up and the command runs. <kbd>Ctrl</kbd>+<kbd>V</kbd> is different: xterm.js turns it into `^V` and
+consumes it, so binding it would replace the working built-in paste with nothing at all — an
+extension keybinding outranks the core one, and `pasteport.paste` is not in the skip list.
+
+So a platform binding needs three things, in this order: a reader, a verified key event that
+actually reaches the command, and only then the manifest entry.
+
 ## Commits
 
 [Conventional Commits](https://www.conventionalcommits.org/): `feat:`, `fix:`, `docs:`, `test:`,

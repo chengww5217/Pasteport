@@ -47,6 +47,12 @@ export function normalizeRemoteDir(value: string): string {
   if (collapsed === '') {
     throw new Error('remoteDir must name a directory below the filesystem root');
   }
+  // `/tmp/..` denotes the root just as `/` does, and the sweeper deletes
+  // recursively. Rejecting dot segments outright is simpler than resolving
+  // them, and no legitimate configuration needs one.
+  if (collapsed.split('/').some((segment) => segment === '.' || segment === '..')) {
+    throw new Error('remoteDir must not contain "." or ".." segments');
+  }
   return collapsed;
 }
 

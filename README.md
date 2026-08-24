@@ -129,6 +129,9 @@ paste depends on, which makes a bug report much easier to act on.
 | `pasteport.ttlHours`            | `24`             | Age at which pasted files are cleaned up; `0` disables           |
 | `pasteport.bracketedPaste`      | `false`          | Wrap the insertion in bracketed paste markers                    |
 
+`pasteport.remoteDir` is machine-scoped: it can be set per user or per machine, but not per
+workspace. The value is written into your terminal, so a repository is not allowed to choose it.
+
 About `quoting`: the target is a TUI agent that treats your input as literal text, where a quote
 character becomes part of the path and silently breaks it. `auto` therefore inserts paths verbatim
 today. Choose `shell` if you mainly paste into a shell that will parse the line.
