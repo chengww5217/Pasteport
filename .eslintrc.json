@@ -24,5 +24,14 @@
     "no-console": "error",
     "curly": ["error", "multi-line"]
   },
-  "ignorePatterns": ["dist", "node_modules", "out", "media"]
+  "ignorePatterns": ["dist", "node_modules", "out", "media"],
+  "overrides": [
+    {
+      "files": ["src/test/**/*.ts"],
+      "rules": {
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/no-floating-promises": "off"
+      }
+    }
+  ]
 }

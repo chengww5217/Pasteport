@@ -5,6 +5,7 @@
     "lib": ["ES2021"],
     "outDir": "dist",
     "rootDir": "src",
+    "esModuleInterop": true,
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,

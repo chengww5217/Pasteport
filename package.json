@@ -35,7 +35,7 @@
     "lint": "eslint src --ext ts",
     "format": "prettier --check .",
     "format:write": "prettier --write .",
-    "test": "npm run compile && node --test dist/test/",
+    "test": "npm run compile && node --test dist/test/*.test.js",
     "package": "npm run compile && npx --yes @vscode/vsce package -o pasteport.vsix",
     "vscode:prepublish": "npm run compile"
   },
