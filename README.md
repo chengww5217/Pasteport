@@ -1,8 +1,15 @@
 # Pasteport
 
 <!-- icon:begin — stripped from the packaged README by scripts/build.mjs; vsce rejects SVG -->
-<img src="assets/icon.svg" alt="Pasteport icon" width="116" align="right" />
+<p align="center">
+  <img src="assets/icon.svg" alt="Pasteport icon" width="128" />
+</p>
 <!-- icon:end -->
+
+<p align="center">
+  <a href="https://marketplace.visualstudio.com/items?itemName=chengww.pasteport"><img src="https://badgen.net/vs-marketplace/v/chengww.pasteport?label=VS%20Code%20Marketplace" alt="VS Code Marketplace version" /></a>
+  <a href="https://open-vsx.org/extension/chengww/pasteport"><img src="https://img.shields.io/open-vsx/v/chengww/pasteport?label=Open%20VSX" alt="Open VSX version" /></a>
+</p>
 
 Press the paste key in the terminal of a VS Code **remote window** and the image or files on your
 local clipboard are sent to the remote host — then the **remote path** is typed into your prompt,
