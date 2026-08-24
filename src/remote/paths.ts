@@ -20,6 +20,11 @@ const MAX_NAME_LENGTH = 200;
  * resolves neither, so accepting them would produce a literal `~` directory on
  * the remote host.
  *
+ * Control characters are rejected because this path is eventually written into
+ * a terminal: an embedded newline would turn a paste into command execution.
+ * The filesystem root is rejected because the TTL sweeper deletes fingerprint
+ * directories recursively, and it must never be pointed at `/`.
+ *
  * @throws Error when the value cannot be used as an absolute POSIX directory.
  */
 export function normalizeRemoteDir(value: string): string {
@@ -33,8 +38,16 @@ export function normalizeRemoteDir(value: string): string {
         '"~" is not expanded by the remote file system'
     );
   }
+  /* eslint-disable-next-line no-control-regex -- rejecting C0/C1 controls is the point */
+  if (/[\u0000-\u001f\u007f]/.test(trimmed)) {
+    throw new Error('remoteDir contains control characters');
+  }
+
   const collapsed = trimmed.replace(/\/+/g, '/').replace(/\/+$/, '');
-  return collapsed === '' ? '/' : collapsed;
+  if (collapsed === '') {
+    throw new Error('remoteDir must name a directory below the filesystem root');
+  }
+  return collapsed;
 }
 
 /**
@@ -75,8 +88,7 @@ function truncateToBytes(value: string, maxBytes: number): string {
 }
 
 export function remoteDirForFingerprint(remoteDir: string, fingerprint: string): string {
-  const base = normalizeRemoteDir(remoteDir);
-  return base === '/' ? `/${fingerprint}` : `${base}/${fingerprint}`;
+  return `${normalizeRemoteDir(remoteDir)}/${fingerprint}`;
 }
 
 export function remoteFilePath(remoteDir: string, fingerprint: string, name: string): string {

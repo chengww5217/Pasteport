@@ -15,6 +15,15 @@ import { remoteUri } from './target';
  * restricted to entries this extension is certain it created, because
  * `pasteport.remoteDir` is user-configurable and pointing it at `/tmp` must not
  * turn a TTL sweep into a general-purpose `/tmp` cleaner.
+ *
+ * Two known limits, both accepted rather than papered over:
+ *  - a deduplicated paste reuses an existing directory without touching its
+ *    mtime (`workspace.fs` has no utimes), so a path injected today can still
+ *    age out on its original schedule;
+ *  - remote mtimes are compared against the local clock, so a badly skewed
+ *    remote clock can make fresh directories look expired.
+ * In both cases the cost is a re-upload, which is why neither justifies extra
+ * machinery.
  */
 
 /** Fingerprint directories, the only thing we create under remoteDir. */

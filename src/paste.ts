@@ -35,7 +35,16 @@ export async function paste(deps: PasteDependencies): Promise<void> {
   // every Cmd+V.
   const template = remoteTemplateUri();
   if (template === undefined) {
-    log.trace('local window, passing the paste through');
+    if (vscode.env.remoteName === undefined) {
+      log.trace('local window, passing the paste through');
+    } else {
+      // Attached to a remote host, but with nothing open there to borrow a URI
+      // from. Logged rather than shown: Cmd+V must not raise dialogs.
+      log.warn(
+        `remote window (${vscode.env.remoteName}) has no remote folder or file open, ` +
+          'so there is no URI to build a target from; passing the paste through'
+      );
+    }
     return passThroughPaste(log);
   }
 
@@ -54,6 +63,16 @@ export async function paste(deps: PasteDependencies): Promise<void> {
   if (!isWritableRemote(template)) {
     log.error(`remote file system "${template.scheme}" is not writable; cannot transfer`);
     showFailure(`Pasteport: the remote file system (${template.scheme}) is not writable.`, log);
+    return;
+  }
+
+  // Reachable only from the command palette — the keybinding requires terminal
+  // focus. Checked before the transfer rather than after: uploading bytes and
+  // then finding nowhere to put the path would report success and leave the user
+  // with nothing.
+  if (vscode.window.terminals.length === 0) {
+    log.warn('no terminal is open, nothing to insert into');
+    void vscode.window.showInformationMessage('Pasteport: open a terminal first.');
     return;
   }
 
@@ -157,6 +176,9 @@ async function describeSources(
           : path.basename(localPath),
       size: stat.size,
       mtimeMs: stat.mtimeMs,
+      // A staged image is written fresh on every clipboard read, so its
+      // metadata is never stable — only its contents identify it.
+      hashContent: kind === 'image',
     });
   }
 

@@ -43,17 +43,26 @@ export interface InjectOptions {
 export async function injectText(text: string, options: InjectOptions): Promise<boolean> {
   if (text === '') return true;
 
-  const payload = options.bracketedPaste
-    ? `${BRACKETED_PASTE_START}${text}${BRACKETED_PASTE_END}`
-    : text;
+  if (vscode.window.terminals.length === 0) {
+    options.log.error('no terminal to inject into');
+    return false;
+  }
 
   // sendSequence resolves ${...} variables in its argument, which would mangle
   // a path that happens to contain one. Rare, but silently wrong, so such paths
   // take the clipboard route instead.
-  if (payload.includes('${')) {
+  if (text.includes('${')) {
     options.log.debug('path contains "${", using the clipboard route to avoid variable expansion');
-    return injectViaClipboard(payload, options.log);
+    return injectViaClipboard(text, options.log);
   }
+
+  // Bracketed paste markers belong to the raw-sequence route only. The
+  // clipboard route goes through the terminal's own paste, which already
+  // brackets the text when the shell has asked for it; adding markers there
+  // would insert them as literal characters.
+  const payload = options.bracketedPaste
+    ? `${BRACKETED_PASTE_START}${text}${BRACKETED_PASTE_END}`
+    : text;
 
   try {
     await vscode.commands.executeCommand('workbench.action.terminal.sendSequence', {
@@ -62,7 +71,7 @@ export async function injectText(text: string, options: InjectOptions): Promise<
     return true;
   } catch (err) {
     options.log.warn(`sendSequence failed (${describeError(err)}); falling back to the clipboard`);
-    return injectViaClipboard(payload, options.log);
+    return injectViaClipboard(text, options.log);
   }
 }
 

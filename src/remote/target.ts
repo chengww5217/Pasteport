@@ -13,10 +13,18 @@ import * as vscode from 'vscode';
 /**
  * A URI belonging to this window, usable as a template.
  *
- * `vscode.env.remoteAuthority` would be the direct route but it is not public
- * API, and workspace folders answer the question just as well.
+ * Two conditions, because either alone is wrong. `env.remoteName` says the
+ * window is attached to a remote host but gives no URI to build from; a
+ * non-file URI on its own can be a virtual file system (`vscode-vfs:` for a
+ * GitHub repository, say) opened in a purely local window, where there is no
+ * remote host to upload to.
+ *
+ * `env.remoteAuthority` would be the direct route and is deliberately avoided:
+ * it is not public API, whereas `remoteName` is.
  */
 export function remoteTemplateUri(): vscode.Uri | undefined {
+  if (vscode.env.remoteName === undefined) return undefined;
+
   const candidates: Array<vscode.Uri | undefined> = [
     ...(vscode.workspace.workspaceFolders ?? []).map((folder) => folder.uri),
     vscode.window.activeTextEditor?.document.uri,

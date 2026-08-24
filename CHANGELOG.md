@@ -26,7 +26,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Known limitations
 
-- macOS clients only. On Windows and Linux the keystroke passes through to the terminal unchanged.
+- macOS clients only, and <kbd>Cmd</kbd>+<kbd>V</kbd> is bound only there. No key is bound on
+  Windows or Linux, so pasting on those clients is untouched until their readers land.
 - Only Remote - SSH has been verified; Dev Containers, WSL and Tunnels use the same code path but
   have not been exercised yet.
 - `quoting: auto` inserts paths verbatim while quote handling in TUI agents is unverified.
+- A transfer already in flight cannot be interrupted mid-file: `workspace.fs.writeFile` has no
+  cancellation point, so cancelling stops the transfer between files.

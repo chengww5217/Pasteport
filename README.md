@@ -25,9 +25,9 @@ Multiple files are inserted space-separated, with a trailing space so you can ke
 ## Requirements
 
 - **macOS client.** The extension runs on your local machine and reads the native pasteboard, and
-  only the macOS reader ships today. On Windows and Linux clients it stays out of the way:
-  <kbd>Ctrl</kbd>+<kbd>V</kbd> keeps doing exactly what it did before. Windows and Linux readers are
-  planned — see [Platform support](#platform-support).
+  only the macOS reader ships today. On Windows and Linux clients it stays out of the way entirely:
+  no key is bound, so pasting behaves exactly as it did before. Readers for both are planned — see
+  [Platform support](#platform-support).
 - **VS Code 1.85 or later**, and a remote window (the local window is not the target scenario).
 - Nothing to install on the remote host.
 
@@ -99,8 +99,12 @@ guessing at a byte count. `Pasteport: Cancel Transfer` is available as a command
 ### Cleanup
 
 Uploaded files and locally staged images older than `pasteport.ttlHours` (24 by default) are
-removed in the background at startup, and on demand via `Pasteport: Clean Up Remote Files`. Only
-directories the extension created are ever deleted.
+removed in the background at startup, and on demand via `Pasteport: Clean Up Remote Files`.
+
+The sweep only ever deletes directories whose names match the extension's own fingerprint format
+(16 hex characters) and staged images matching its own naming scheme. Anything else under
+`remoteDir` is counted and left alone, so pointing the setting at a shared directory cannot turn
+cleanup into collateral damage.
 
 ## Commands
 
@@ -131,14 +135,17 @@ today. Choose `shell` if you mainly paste into a shell that will parse the line.
 
 ## Keybinding
 
-| Platform | Key                                           | Notes                                                                                                                                |
-| -------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| macOS    | <kbd>Cmd</kbd>+<kbd>V</kbd>                   | Matches the terminal's own paste binding                                                                                             |
-| Windows  | <kbd>Ctrl</kbd>+<kbd>V</kbd>                  | Reader not implemented yet; passes through                                                                                           |
-| Linux    | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd> | Matches the terminal's own paste binding; <kbd>Ctrl</kbd>+<kbd>V</kbd> is `quoted-insert` in readline and is deliberately left alone |
+<kbd>Cmd</kbd>+<kbd>V</kbd> is bound on macOS, while the terminal has focus. It matches the
+terminal's own paste binding, so the key keeps doing what it always did unless there is an image or
+a file on the clipboard.
 
-The binding is active only when the terminal has focus. To use a different key, rebind
-`pasteport.paste` in your keyboard shortcuts.
+**No key is bound on Windows or Linux.** Each platform's binding arrives with its reader: claiming
+the key earlier would shadow the terminal's own paste and leave those platforms worse off than
+without the extension installed. On Linux the binding will be
+<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd> — <kbd>Ctrl</kbd>+<kbd>V</kbd> is `quoted-insert` in
+readline and will be left alone.
+
+To use a different key, rebind `pasteport.paste` in your keyboard shortcuts.
 
 ## Platform support
 

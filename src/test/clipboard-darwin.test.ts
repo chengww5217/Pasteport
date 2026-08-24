@@ -46,11 +46,16 @@ test('the JXA reader runs and returns a contract-shaped payload', darwinOnly, as
 });
 
 test('a missing reader script fails as an error payload, not a throw', darwinOnly, async () => {
-  const content = await readDarwinClipboard({
-    scriptPath: path.join(os.tmpdir(), 'pasteport-absent-reader.js'),
-    stagingDir: await fs.mkdtemp(path.join(os.tmpdir(), 'pasteport-staging-test-')),
-    log: silentLogger,
-  });
+  const stagingDir = await fs.mkdtemp(path.join(os.tmpdir(), 'pasteport-staging-test-'));
+  try {
+    const content = await readDarwinClipboard({
+      scriptPath: path.join(os.tmpdir(), 'pasteport-absent-reader.js'),
+      stagingDir,
+      log: silentLogger,
+    });
 
-  assert.equal(content.kind, 'error');
+    assert.equal(content.kind, 'error');
+  } finally {
+    await fs.rm(stagingDir, { recursive: true, force: true });
+  }
 });

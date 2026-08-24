@@ -20,6 +20,14 @@ export interface SourceFile {
   remoteName: string;
   size: number;
   mtimeMs: number;
+  /**
+   * Forces a content hash regardless of size.
+   *
+   * Set for staged clipboard images: the reader writes a new file with a new
+   * mtime on every read, so a metadata key would be unique every time and the
+   * same screenshot would upload again on every paste.
+   */
+  hashContent?: boolean;
 }
 
 export interface TransferOptions {
@@ -174,7 +182,7 @@ export class TransferService {
   }
 
   private async fingerprint(source: SourceFile): Promise<string> {
-    if (shouldHashContent(source.size)) {
+    if (source.hashContent === true || shouldHashContent(source.size)) {
       // Read twice (here, and again to upload) rather than holding the bytes:
       // local reads run at ~800 MB/s, and a multi-file paste would otherwise
       // pin every payload in the extension host at once.
@@ -240,13 +248,18 @@ export class TransferService {
 
             const { source } = entry;
             const stopTicker = startTicker(progress, source, this.estimator);
-            const started = Date.now();
+            let writeMs = 0;
 
             try {
               await vscode.workspace.fs.createDirectory(entry.dirUri);
 
               const bytes = await fs.readFile(source.localPath);
+              // Timed around writeFile alone: including the createDirectory
+              // round trip would bias the rate estimate low and make ordinary
+              // pastes trip the confirmation threshold.
+              const started = Date.now();
               await vscode.workspace.fs.writeFile(entry.fileUri, bytes);
+              writeMs = Date.now() - started;
             } catch (err) {
               // Remove the truncated file only. The fingerprint directory can
               // hold an earlier, still-referenced paste; an empty one is
@@ -257,20 +270,28 @@ export class TransferService {
               stopTicker();
             }
 
-            const elapsed = Date.now() - started;
             uploadedBytes += source.size;
-            this.recordSample(source.size, elapsed);
+            this.recordSample(source.size, writeMs);
             this.log.info(
-              `uploaded ${formatBytes(source.size)} in ${elapsed}ms -> ${entry.remotePath}`
+              `uploaded ${formatBytes(source.size)} in ${writeMs}ms -> ${entry.remotePath}`
             );
 
             // Percentage only shows up in the notification, but reporting it
-            // unconditionally keeps one code path.
-            progress.report({ increment: (source.size / pendingBytes) * 100 });
+            // unconditionally keeps one code path. Files of zero length carry no
+            // weight, so fall back to counting them evenly.
+            progress.report({
+              increment:
+                pendingBytes > 0 ? (source.size / pendingBytes) * 100 : 100 / pending.length,
+            });
           }
         } finally {
           link.dispose();
         }
+
+        // The loop can only observe cancellation before a write starts, so a
+        // cancel arriving during the last (often only) file would otherwise be
+        // dropped here and the path injected anyway.
+        if (cts.token.isCancellationRequested) return { status: 'cancelled' };
 
         return {
           status: 'done',

@@ -32,6 +32,12 @@
     "onStartupFinished"
   ],
   "main": "./dist/extension.js",
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true,
+      "description": "Pasteport only reads the clipboard and writes to the configured remote directory; the directory setting is machine-scoped, so an untrusted workspace cannot redirect it."
+    }
+  },
   "contributes": {
     "commands": [
       {
@@ -58,10 +64,8 @@
     "keybindings": [
       {
         "command": "pasteport.paste",
-        "key": "ctrl+shift+v",
-        "win": "ctrl+v",
-        "mac": "cmd+v",
-        "when": "terminalFocus"
+        "key": "cmd+v",
+        "when": "terminalFocus && isMac"
       }
     ],
     "configuration": {
@@ -70,6 +74,7 @@
         "pasteport.remoteDir": {
           "type": "string",
           "default": "/tmp/pasteport",
+          "scope": "machine",
           "markdownDescription": "Absolute POSIX directory on the remote host where pasted files land. `~` is not expanded."
         },
         "pasteport.quoting": {

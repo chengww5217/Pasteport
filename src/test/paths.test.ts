@@ -13,7 +13,6 @@ test('normalizeRemoteDir canonicalises absolute paths', () => {
   assert.equal(normalizeRemoteDir(DEFAULT_REMOTE_DIR), '/tmp/pasteport');
   assert.equal(normalizeRemoteDir('  /tmp/pasteport/  '), '/tmp/pasteport');
   assert.equal(normalizeRemoteDir('/tmp//pasteport///x'), '/tmp/pasteport/x');
-  assert.equal(normalizeRemoteDir('/'), '/');
 });
 
 test('normalizeRemoteDir rejects what workspace.fs cannot resolve', () => {
@@ -21,6 +20,18 @@ test('normalizeRemoteDir rejects what workspace.fs cannot resolve', () => {
   assert.throws(() => normalizeRemoteDir('~/pasteport'), /absolute POSIX path/);
   assert.throws(() => normalizeRemoteDir('tmp/pasteport'), /absolute POSIX path/);
   assert.throws(() => normalizeRemoteDir('   '), /empty/);
+});
+
+test('normalizeRemoteDir rejects a newline that would run a command', () => {
+  // The path is written into a terminal; an embedded newline would execute.
+  assert.throws(() => normalizeRemoteDir('/tmp/x\ntouch pwned\n#'), /control characters/);
+  assert.throws(() => normalizeRemoteDir('/tmp/\u0007bell'), /control characters/);
+});
+
+test('normalizeRemoteDir rejects the filesystem root', () => {
+  // The sweeper deletes fingerprint directories recursively; not at /.
+  assert.throws(() => normalizeRemoteDir('/'), /below the filesystem root/);
+  assert.throws(() => normalizeRemoteDir('///'), /below the filesystem root/);
 });
 
 test('sanitizeFileName keeps names the remote side never re-parses', () => {
@@ -68,7 +79,6 @@ test('remote paths put the fingerprint in a directory of its own', () => {
     remoteDirForFingerprint('/tmp/pasteport', 'a1b2c3d4e5f60718'),
     '/tmp/pasteport/a1b2c3d4e5f60718'
   );
-  assert.equal(remoteDirForFingerprint('/', 'a1b2'), '/a1b2');
   assert.equal(
     remoteFilePath('/tmp/pasteport/', 'a1b2', 'My Report.zip'),
     '/tmp/pasteport/a1b2/My Report.zip'
