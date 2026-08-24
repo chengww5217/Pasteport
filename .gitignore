@@ -1,5 +1,4 @@
 # --- build output; also holds internal design docs and spikes, intentionally untracked ---
-out/
 dist/
 *.vsix
 

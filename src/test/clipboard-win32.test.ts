@@ -8,8 +8,8 @@ import { STAGED_IMAGE_PATTERN } from '../clipboard/index';
 import { powershellPath, readWin32Clipboard } from '../clipboard/win32';
 import { silentLogger } from '../log';
 
-// out/test/… -> repository root, where resources/ sits next to the compiled output.
-const scriptPath = path.join(__dirname, '..', '..', 'resources', 'clipboard-read.win32.ps1');
+// dist/tsc/test/… -> repository root, where resources/ sits next to dist/.
+const scriptPath = path.join(__dirname, '..', '..', '..', 'resources', 'clipboard-read.win32.ps1');
 const win32Only = { skip: process.platform !== 'win32' ? 'Windows only' : false };
 
 /** Anything here means PowerShell rejected the script, not the clipboard. */

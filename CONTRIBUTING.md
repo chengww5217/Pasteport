@@ -7,8 +7,8 @@ are especially useful — that command prints every condition a successful paste
 
 ```sh
 npm install
-npm run compile      # tsc, strict; type-checks into out/, which the tests run from
-npm run build        # esbuild bundle + icon + packaged readme, all into dist/
+npm run compile      # tsc, strict; type-checks into dist/tsc/, which the tests run from
+npm run build        # esbuild bundle + icon + packaged readme, all into dist/build/
 npm run lint         # eslint, type-aware rules
 npm run format       # prettier --check (use format:write to fix)
 npm test             # compile + node:test
@@ -25,7 +25,7 @@ clipboard, without modifying it.
 
 ## Running the extension
 
-Open the repository in VS Code and press <kbd>F5</kbd>. `npm run watch` keeps `dist/extension.js`
+Open the repository in VS Code and press <kbd>F5</kbd>. `npm run watch` keeps `dist/build/extension.js`
 rebuilt as you edit — unminified and with a source map, unlike the packaged build. Note that the
 interesting behaviour only appears in a **remote window**: in a local window every paste falls
 through to the terminal by design, so an end-to-end check needs a Remote - SSH (or Dev Containers /
@@ -34,37 +34,53 @@ WSL) window with a folder open.
 To package:
 
 ```sh
-npm run package     # produces out/pasteport.vsix
+npm run package     # produces dist/pasteport-<version>.vsix
 ```
 
 ## What ends up in the vsix
 
-`scripts/build.mjs` produces everything shipped that is not checked in, all under `dist/` and none
-of it committed:
+Every generated file lives under `dist/`, and nothing under it is committed. The three subdivisions
+have different fates, which is the whole reason they are kept apart:
 
-- **`dist/extension.js`** — the whole extension bundled and minified by esbuild into one CommonJS
-  file, about 19 KB against roughly 70 KB of unbundled `tsc` output. `vscode` stays external
-  because the host provides it; nothing else is imported beyond node builtins. The source map is
-  written as `sourcemap: 'external'`, so it exists locally for symbolicating stack traces but is
-  neither packaged nor referenced from the shipped bundle.
-- **`dist/icon.png`** — 256×256, because the Marketplace and the Extensions view accept raster
+```
+dist/build/                 what ships — produced by scripts/build.mjs
+dist/tsc/                   tsc output — type-checking and tests only, never packaged
+dist/pasteport-<version>.vsix   the finished package
+```
+
+`scripts/build.mjs` produces everything shipped that is not checked in:
+
+- **`dist/build/extension.js`** — the whole extension bundled and minified by esbuild into one
+  CommonJS file, about 19 KB against roughly 70 KB of unbundled `tsc` output. `vscode` stays
+  external because the host provides it; nothing else is imported beyond node builtins. The source
+  map is written as `sourcemap: 'external'`, so it exists locally for symbolicating stack traces but
+  is neither packaged nor referenced from the shipped bundle.
+- **`dist/build/icon.png`** — 256×256, because the Marketplace and the Extensions view accept raster
   icons only. `assets/icon.svg` is the source of truth and the only icon file in the repository;
   edit the SVG, the PNG is disposable.
-- **`dist/README.md`** — a copy of `README.md` with the `<!-- icon:begin -->` block removed. vsce
-  refuses an SVG anywhere in a README, and the Marketplace renders the icon in the page header
+- **`dist/build/README.md`** — a copy of `README.md` with the `<!-- icon:begin -->` block removed.
+  vsce refuses an SVG anywhere in a README, and the Marketplace renders the icon in the page header
   anyway, so the image is shown on GitHub and left out of the package. `npm run package` passes
-  `--readme-path dist/README.md`; keep that flag on any hand-rolled vsce invocation, and note that
-  `README.md` itself is in `.vscodeignore` so the two copies cannot collide.
+  `--readme-path dist/build/README.md`; keep that flag on any hand-rolled vsce invocation, and note
+  that `README.md` itself is in `.vscodeignore` so the two copies cannot collide.
 
-`tsc` output goes to `out/` instead and is never packaged: it exists to type-check and to give the
-tests plain unbundled modules to run against. esbuild does not type-check, so `npm run compile` and
-`npm run build` are both needed and neither replaces the other. The vsix lands in `out/` too, so the
-repository root stays free of build output.
+`tsc` output goes to `dist/tsc/` and is never packaged: it exists to type-check and to give the tests
+plain unbundled modules to run against, which a single bundle cannot provide — it exposes only the
+`extension.ts` entry point, and that entry point imports `vscode`, so requiring it under bare node
+fails. esbuild does not type-check, so `npm run compile` and `npm run build` are both needed and
+neither replaces the other.
+
+`.vscodeignore` is what enforces the split, and it carries the risk: `dist/tsc/**` and `dist/*.vsix`
+are excluded, the second because the vsix is written into `dist/` alongside the rest and packaging
+twice would otherwise nest the previous package inside the next one. Adding anything to `dist/`
+means deciding whether it ships.
+
+Two consequences worth remembering when moving files around: `dist/tsc/test/…` reaches the
+repository root three levels up, which the two tests that locate a reader script depend on, and the
+extension itself finds `resources/` through `context.extensionPath` rather than a relative path, so
+it is unaffected by this layout.
 
 The icon SVG contains no `<text>`, and the renderer runs with system fonts disabled, so the PNG is
-identical on every machine.
-
-The SVG contains no `<text>`, and the renderer runs with system fonts disabled, so the output is
 identical on every machine.
 
 ## Architecture in one paragraph

@@ -2,14 +2,19 @@
 .github/**
 assets/**
 scripts/**
-out/**
 src/**
-dist/**/*.map
 
-# the packaged readme is dist/README.md (see --readme-path); excluding the original
+# dist/build/** is the only part of dist/ that ships: dist/tsc/ is the tsc output the
+# tests run from, and the finished vsix is written into dist/ itself — without the line
+# below, packaging twice would put the previous vsix inside the next one.
+dist/tsc/**
+dist/*.vsix
+dist/build/**/*.map
+
+# the packaged readme is dist/build/README.md (see --readme-path); excluding the original
 # keeps it from colliding with the copy vsce adds as readme.md
 README.md
-dist/README.md
+dist/build/README.md
 
 node_modules/**
 .gitignore

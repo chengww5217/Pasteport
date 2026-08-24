@@ -1,12 +1,13 @@
 #!/usr/bin/env node
-// Produces everything the vsix contains that is not checked in, all of it under dist/:
+// Produces everything the vsix contains that is not checked in, all of it under dist/build/:
 //
-//   src/extension.ts -> dist/extension.js  one bundled, minified CommonJS file
-//   assets/icon.svg  -> dist/icon.png      the Marketplace accepts raster icons only
-//   README.md        -> dist/README.md     the Marketplace rejects SVG in a README
+//   src/extension.ts -> dist/build/extension.js  one bundled, minified CommonJS file
+//   assets/icon.svg  -> dist/build/icon.png      the Marketplace accepts raster icons only
+//   README.md        -> dist/build/README.md     the Marketplace rejects SVG in a README
 //
-// `npm run compile` is a separate step: it type-checks into out/, which is where the
-// tests run from. esbuild does not type-check, so neither replaces the other.
+// `npm run compile` is a separate step: it type-checks into dist/tsc/, which is where
+// the tests run from and which is never packaged. esbuild does not type-check, so
+// neither replaces the other. The finished vsix is written to dist/ itself.
 //
 // Pass --watch to rebuild the bundle on change, unminified and with a source map.
 
@@ -17,10 +18,10 @@ import { Resvg } from '@resvg/resvg-js';
 import * as esbuild from 'esbuild';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const dist = resolve(root, 'dist');
+const outDir = resolve(root, 'dist/build');
 const watch = process.argv.includes('--watch');
 
-mkdirSync(dist, { recursive: true });
+mkdirSync(outDir, { recursive: true });
 
 // --- bundle -------------------------------------------------------------------
 // One file instead of a tree of tsc output: the extension host loads a single
@@ -29,7 +30,7 @@ mkdirSync(dist, { recursive: true });
 // else is imported beyond node builtins.
 const options = {
   entryPoints: [resolve(root, 'src/extension.ts')],
-  outfile: resolve(dist, 'extension.js'),
+  outfile: resolve(outDir, 'extension.js'),
   bundle: true,
   platform: 'node',
   format: 'cjs',
@@ -48,11 +49,11 @@ const options = {
 if (watch) {
   const context = await esbuild.context(options);
   await context.watch();
-  console.log('bundle: watching src/ -> dist/extension.js');
+  console.log('bundle: watching src/ -> dist/build/extension.js');
 } else {
   await esbuild.build(options);
   const bytes = readFileSync(options.outfile).length;
-  console.log(`bundle: ${bytes} bytes -> dist/extension.js`);
+  console.log(`bundle: ${bytes} bytes -> dist/build/extension.js`);
 }
 
 // --- icon ---------------------------------------------------------------------
@@ -71,8 +72,8 @@ if (rendered.width !== SIZE || rendered.height !== SIZE) {
 }
 
 const png = rendered.asPng();
-writeFileSync(resolve(dist, 'icon.png'), png);
-console.log(`icon:   ${SIZE}x${SIZE}, ${png.length} bytes -> dist/icon.png`);
+writeFileSync(resolve(outDir, 'icon.png'), png);
+console.log(`icon:   ${SIZE}x${SIZE}, ${png.length} bytes -> dist/build/icon.png`);
 
 // --- readme -------------------------------------------------------------------
 // The icon block is shown on GitHub and dropped here: vsce refuses an SVG anywhere
@@ -86,5 +87,5 @@ if (!ICON_BLOCK.test(readme)) {
 }
 
 const stripped = readme.replace(ICON_BLOCK, '');
-writeFileSync(resolve(dist, 'README.md'), stripped);
-console.log(`readme: icon block stripped, ${stripped.length} bytes -> dist/README.md`);
+writeFileSync(resolve(outDir, 'README.md'), stripped);
+console.log(`readme: icon block stripped, ${stripped.length} bytes -> dist/build/README.md`);

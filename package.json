@@ -15,7 +15,7 @@
   "engines": {
     "vscode": "^1.85.0"
   },
-  "icon": "dist/icon.png",
+  "icon": "dist/build/icon.png",
   "categories": [
     "Other"
   ],
@@ -32,7 +32,7 @@
   "activationEvents": [
     "onStartupFinished"
   ],
-  "main": "./dist/extension.js",
+  "main": "./dist/build/extension.js",
   "capabilities": {
     "untrustedWorkspaces": {
       "supported": true,
@@ -140,8 +140,8 @@
     "lint": "eslint src --ext ts",
     "format": "prettier --check .",
     "format:write": "prettier --write .",
-    "test": "npm run compile && node --test \"out/test/*.test.js\"",
-    "package": "npx --yes @vscode/vsce package --readme-path dist/README.md -o out/pasteport.vsix",
+    "test": "npm run compile && node --test \"dist/tsc/test/*.test.js\"",
+    "package": "npx --yes @vscode/vsce package --readme-path dist/build/README.md -o dist/",
     "vscode:prepublish": "npm run compile && npm run build"
   },
   "devDependencies": {

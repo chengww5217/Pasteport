@@ -8,8 +8,8 @@ import { readDarwinClipboard } from '../clipboard/darwin';
 import { STAGED_IMAGE_PATTERN } from '../clipboard/index';
 import { silentLogger } from '../log';
 
-// out/test/… -> repository root, where resources/ sits next to the compiled output.
-const scriptPath = path.join(__dirname, '..', '..', 'resources', 'clipboard-read.darwin.js');
+// dist/tsc/test/… -> repository root, where resources/ sits next to dist/.
+const scriptPath = path.join(__dirname, '..', '..', '..', 'resources', 'clipboard-read.darwin.js');
 const darwinOnly = { skip: process.platform !== 'darwin' ? 'macOS only' : false };
 
 test('the staged image pattern accepts the readers format and nothing else', () => {
