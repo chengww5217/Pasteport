@@ -28,7 +28,90 @@
   "extensionKind": [
     "ui"
   ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "pasteport.paste",
+        "title": "Paste into Remote Terminal",
+        "category": "Pasteport"
+      },
+      {
+        "command": "pasteport.cancelTransfer",
+        "title": "Cancel Transfer",
+        "category": "Pasteport"
+      },
+      {
+        "command": "pasteport.cleanUpRemoteFiles",
+        "title": "Clean Up Remote Files",
+        "category": "Pasteport"
+      },
+      {
+        "command": "pasteport.diagnose",
+        "title": "Diagnose",
+        "category": "Pasteport"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "pasteport.paste",
+        "key": "ctrl+shift+v",
+        "win": "ctrl+v",
+        "mac": "cmd+v",
+        "when": "terminalFocus"
+      }
+    ],
+    "configuration": {
+      "title": "Pasteport",
+      "properties": {
+        "pasteport.remoteDir": {
+          "type": "string",
+          "default": "/tmp/pasteport",
+          "markdownDescription": "Absolute POSIX directory on the remote host where pasted files land. `~` is not expanded."
+        },
+        "pasteport.quoting": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "shell",
+            "none"
+          ],
+          "enumDescriptions": [
+            "Currently equivalent to none; will adapt once TUI quoting behaviour is verified.",
+            "Single-quote paths that contain special characters, for use in a shell.",
+            "Insert paths verbatim, for TUI agents that do not parse shell syntax."
+          ],
+          "default": "auto",
+          "description": "How remote paths are quoted when inserted into the terminal."
+        },
+        "pasteport.trailingSpace": {
+          "type": "boolean",
+          "default": true,
+          "description": "Append a space after the inserted path so you can keep typing."
+        },
+        "pasteport.confirmAboveSeconds": {
+          "type": "number",
+          "default": 5,
+          "minimum": 0,
+          "markdownDescription": "Ask before transfers estimated to take longer than this many seconds, using the measured transfer rate. Set to `0` to never ask."
+        },
+        "pasteport.ttlHours": {
+          "type": "number",
+          "default": 24,
+          "minimum": 0,
+          "markdownDescription": "Age at which pasted files are removed from the remote host and the local staging directory. Set to `0` to disable cleanup."
+        },
+        "pasteport.bracketedPaste": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Wrap the inserted path in bracketed paste markers (`ESC[200~` … `ESC[201~`). Off by default; compatibility across TUIs is unverified."
+        }
+      }
+    }
+  },
   "scripts": {
     "compile": "tsc -p ./",
     "watch": "tsc -p ./ -w",

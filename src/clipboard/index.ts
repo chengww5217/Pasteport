@@ -11,6 +11,15 @@ export type { ClipboardContent } from './types';
 /** Where platform readers stage images they extract from the clipboard. */
 export const STAGING_DIR = path.join(os.tmpdir(), 'pasteport-staging');
 
+/**
+ * The name shape every platform reader must produce for a staged image:
+ * `clipboard-<yyyymmdd>-<hhmmss>-<mmm>.png`.
+ *
+ * The TTL sweeper deletes only names matching this, so the contract between the
+ * readers and the sweeper is stated here rather than duplicated at both ends.
+ */
+export const STAGED_IMAGE_PATTERN = /^clipboard-\d{8}-\d{6}-\d{3}\.png$/;
+
 export interface ClipboardReader {
   read(): Promise<ClipboardContent>;
 }

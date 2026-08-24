@@ -11,6 +11,8 @@ export interface Logger {
   info(message: string, ...args: unknown[]): void;
   warn(message: string, ...args: unknown[]): void;
   error(message: string | Error, ...args: unknown[]): void;
+  /** Brings the log into view; `vscode.LogOutputChannel.show` matches. */
+  show(preserveFocus?: boolean): void;
 }
 
 /** Discards everything; used where a logger is optional. */
@@ -20,6 +22,7 @@ export const silentLogger: Logger = {
   info: () => undefined,
   warn: () => undefined,
   error: () => undefined,
+  show: () => undefined,
 };
 
 /** Renders any thrown value as one log line. */

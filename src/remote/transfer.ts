@@ -60,6 +60,11 @@ export class TransferService {
     this.estimator = new RateEstimator(store.read());
   }
 
+  /** Current throughput estimate, for the diagnostics command. */
+  get rateBytesPerSecond(): number {
+    return this.estimator.bytesPerSecond;
+  }
+
   /**
    * Aborts the transfer in flight, if any.
    *
@@ -223,15 +228,15 @@ export class TransferService {
       { location, title: 'Pasteport', cancellable: confirmed },
       async (progress, progressToken): Promise<TransferOutcome> => {
         const link = progressToken.onCancellationRequested(() => cts.cancel());
-        const createdDirs: vscode.Uri[] = [];
         let uploadedBytes = 0;
 
         try {
           for (const entry of pending) {
-            if (cts.token.isCancellationRequested) {
-              await this.discard(createdDirs);
-              return { status: 'cancelled' };
-            }
+            // writeFile cannot be interrupted, so a cancellation always lands
+            // between files: whatever is already up is complete and will either
+            // be reused by a later paste or aged out, and only a genuine
+            // failure can leave a half-written file behind.
+            if (cts.token.isCancellationRequested) return { status: 'cancelled' };
 
             const { source } = entry;
             const stopTicker = startTicker(progress, source, this.estimator);
@@ -239,12 +244,14 @@ export class TransferService {
 
             try {
               await vscode.workspace.fs.createDirectory(entry.dirUri);
-              createdDirs.push(entry.dirUri);
 
               const bytes = await fs.readFile(source.localPath);
               await vscode.workspace.fs.writeFile(entry.fileUri, bytes);
             } catch (err) {
-              await this.discard(createdDirs);
+              // Remove the truncated file only. The fingerprint directory can
+              // hold an earlier, still-referenced paste; an empty one is
+              // harmless and the TTL sweeper will collect it.
+              await this.discard(entry.fileUri);
               return { status: 'failed', message: describeFsError(err) };
             } finally {
               stopTicker();
@@ -285,20 +292,16 @@ export class TransferService {
   }
 
   /**
-   * Removes what this transfer created after a cancel or a failure.
+   * Removes a file whose write failed part-way.
    *
-   * `writeFile` is not interruptible, so a cancel lands between files and the
-   * half-written case can only come from a genuine failure — either way, the
-   * directories must not be left behind for an agent to read a truncated file
-   * out of.
+   * A truncated payload is worse than a missing one: an agent reading it gets
+   * plausible-looking garbage instead of an error.
    */
-  private async discard(dirs: readonly vscode.Uri[]): Promise<void> {
-    for (const dir of dirs) {
-      try {
-        await vscode.workspace.fs.delete(dir, { recursive: true, useTrash: false });
-      } catch (err) {
-        this.log.debug(`could not clean up ${dir.path}: ${describeError(err)}`);
-      }
+  private async discard(file: vscode.Uri): Promise<void> {
+    try {
+      await vscode.workspace.fs.delete(file, { recursive: false, useTrash: false });
+    } catch (err) {
+      this.log.debug(`could not clean up ${file.path}: ${describeError(err)}`);
     }
   }
 }

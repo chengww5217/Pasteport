@@ -3,6 +3,7 @@ import * as path from 'node:path';
 
 import * as vscode from 'vscode';
 
+import { STAGED_IMAGE_PATTERN } from '../clipboard';
 import { describeError, type Logger } from '../log';
 import { normalizeRemoteDir } from './paths';
 import { remoteUri } from './target';
@@ -18,9 +19,6 @@ import { remoteUri } from './target';
 
 /** Fingerprint directories, the only thing we create under remoteDir. */
 const FINGERPRINT_DIR = /^[0-9a-f]{16}$/;
-
-/** Staged image names, the only thing the readers create under stagingDir. */
-const STAGED_FILE = /^clipboard-\d{8}-\d{6}-\d{3}\.png$/;
 
 export interface SweepResult {
   removed: number;
@@ -121,7 +119,7 @@ export async function sweepStaging(options: {
   const result: SweepResult = { removed: 0, kept: 0, foreign: 0 };
 
   for (const name of names) {
-    if (!STAGED_FILE.test(name)) {
+    if (!STAGED_IMAGE_PATTERN.test(name)) {
       result.foreign += 1;
       continue;
     }
