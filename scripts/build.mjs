@@ -78,7 +78,9 @@ console.log(`icon:   ${SIZE}x${SIZE}, ${png.length} bytes -> dist/build/icon.png
 // --- readme -------------------------------------------------------------------
 // The icon block is shown on GitHub and dropped here: vsce refuses an SVG anywhere
 // in a README, and the Marketplace renders the icon in the page header anyway.
-const ICON_BLOCK = /^<!-- icon:begin[\s\S]*?<!-- icon:end -->\n\n/m;
+// The line ending is optional so a CRLF checkout still matches, whatever a
+// contributor's core.autocrlf says.
+const ICON_BLOCK = /^<!-- icon:begin[\s\S]*?<!-- icon:end -->\r?\n\r?\n/m;
 
 const readme = readFileSync(resolve(root, 'README.md'), 'utf8');
 

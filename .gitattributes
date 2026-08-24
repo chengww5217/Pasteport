@@ -1,0 +1,5 @@
+# GitHub's Windows runners ship with core.autocrlf=true, which hands the checkout a
+# CRLF working tree — enough to break anything matching on "\n" and to make Prettier
+# report every file as unformatted. Normalise to LF everywhere instead; nothing here
+# needs CRLF, including the PowerShell reader.
+* text=auto eol=lf
