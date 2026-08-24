@@ -8,9 +8,13 @@ import { paste } from './paste';
 import { sweepRemote, sweepStaging } from './remote/sweeper';
 import { isWritableRemote, remoteTemplateUri } from './remote/target';
 import { TransferService, type RateStore } from './remote/transfer';
+import { ensurePasteKeyReachesExtension, type PromptSuppression } from './skipShell';
 
 /** Where the measured throughput survives a window reload. */
 const RATE_KEY = 'pasteport.rateBytesPerSecond';
+
+/** Set once the user declines the commandsToSkipShell prompt for good. */
+const SKIP_SHELL_PROMPT_KEY = 'pasteport.skipShellPromptDismissed';
 
 export function activate(context: vscode.ExtensionContext): void {
   const log = vscode.window.createOutputChannel('Pasteport', { log: true });
@@ -68,6 +72,13 @@ export function activate(context: vscode.ExtensionContext): void {
   // Cleanup is best-effort background work: it must never delay a paste, and a
   // failure here is not worth a dialog.
   void cleanUp(log, false);
+
+  // On Windows and Linux the keybinding is only useful if the command is allowed
+  // to skip the shell. Nothing to check when no reader exists: the command would
+  // pass the paste through anyway.
+  if (reader !== undefined) {
+    void ensurePasteKeyReachesExtension(log, skipShellPromptSuppression(context));
+  }
 }
 
 export function deactivate(): void {
@@ -79,6 +90,16 @@ function rateStore(context: vscode.ExtensionContext): RateStore {
     read: () => context.globalState.get<number>(RATE_KEY),
     write: (bytesPerSecond) => {
       void context.globalState.update(RATE_KEY, bytesPerSecond);
+    },
+  };
+}
+
+/** Remembers "don't ask again" for the commandsToSkipShell prompt. */
+function skipShellPromptSuppression(context: vscode.ExtensionContext): PromptSuppression {
+  return {
+    isSuppressed: () => context.globalState.get<boolean>(SKIP_SHELL_PROMPT_KEY) === true,
+    suppress: () => {
+      void context.globalState.update(SKIP_SHELL_PROMPT_KEY, true);
     },
   };
 }

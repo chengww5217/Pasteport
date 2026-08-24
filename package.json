@@ -67,8 +67,23 @@
         "command": "pasteport.paste",
         "key": "cmd+v",
         "when": "terminalFocus && isMac"
+      },
+      {
+        "command": "pasteport.paste",
+        "key": "ctrl+v",
+        "when": "terminalFocus && isWindows"
+      },
+      {
+        "command": "pasteport.paste",
+        "key": "ctrl+shift+v",
+        "when": "terminalFocus && isLinux"
       }
     ],
+    "configurationDefaults": {
+      "terminal.integrated.commandsToSkipShell": [
+        "pasteport.paste"
+      ]
+    },
     "configuration": {
       "title": "Pasteport",
       "properties": {

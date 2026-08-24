@@ -57,8 +57,8 @@ if (watch) {
 
 // --- icon ---------------------------------------------------------------------
 // 128x128 is the documented minimum; 256 keeps it crisp on hidpi listings. The SVG
-// deliberately contains no <text>, and system fonts are disabled, so the output is
-// identical on every machine.
+// deliberately contains no <text> — the wordmark is outlined into a path — and system
+// fonts are disabled, so the output is identical on every machine.
 const SIZE = 256;
 
 const rendered = new Resvg(readFileSync(resolve(root, 'assets/icon.svg'), 'utf8'), {
