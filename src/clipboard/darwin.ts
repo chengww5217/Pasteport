@@ -18,7 +18,7 @@ const READ_TIMEOUT_MS = 10_000;
 const MAX_STDOUT_BYTES = 1024 * 1024;
 
 export interface DarwinReaderOptions {
-  /** Absolute path to media/clipboard-read.js. */
+  /** Absolute path to the platform reader, e.g. resources/clipboard-read.darwin.js. */
   scriptPath: string;
   /** Directory the reader writes staged images into; created if absent. */
   stagingDir: string;

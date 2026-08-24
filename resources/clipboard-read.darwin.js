@@ -1,7 +1,7 @@
 /*
  * macOS clipboard reader — JXA (`osascript -l JavaScript`).
  *
- * Usage:  osascript -l JavaScript clipboard-read.js <stagingDir>
+ * Usage:  osascript -l JavaScript clipboard-read.darwin.js <stagingDir>
  * Output: one JSON object on stdout, per src/clipboard/types.ts.
  *
  * Why an out-of-process script rather than a native addon: importing AppKit

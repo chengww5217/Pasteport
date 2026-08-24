@@ -24,7 +24,7 @@
     "no-console": "error",
     "curly": ["error", "multi-line"]
   },
-  "ignorePatterns": ["dist", "node_modules", "out", "media"],
+  "ignorePatterns": ["dist", "node_modules", "out", "resources"],
   "overrides": [
     {
       "files": ["src/test/**/*.ts"],

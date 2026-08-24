@@ -25,7 +25,7 @@ export interface ClipboardReader {
 }
 
 export interface ReaderContext {
-  /** Root of the installed extension; media/ lives directly under it. */
+  /** Root of the installed extension; resources/ lives directly under it. */
   extensionPath: string;
   log: Logger;
 }
@@ -41,7 +41,9 @@ export interface ReaderContext {
 export function createClipboardReader(context: ReaderContext): ClipboardReader | undefined {
   if (process.platform !== 'darwin') return undefined;
 
-  const scriptPath = path.join(context.extensionPath, 'media', 'clipboard-read.js');
+  // Readers ship as plain files under resources/ rather than being bundled: this
+  // one is handed to osascript by path, never required.
+  const scriptPath = path.join(context.extensionPath, 'resources', 'clipboard-read.darwin.js');
   return {
     read: async (): Promise<ClipboardContent> => {
       const content = await readDarwinClipboard({

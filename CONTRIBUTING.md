@@ -70,14 +70,17 @@ identical on every machine.
 ## Architecture in one paragraph
 
 The extension is `extensionKind: ["ui"]`, so it runs locally and can read the native pasteboard.
-`media/clipboard-read.js` is an out-of-process JXA reader that emits a small JSON payload;
-`src/paste.ts` is the only module with business branching, and everything it decides not to handle
-falls through to the terminal's own paste. Transfers go through `workspace.fs` with a URI borrowed
-from the window, which is why no backend-specific code exists.
+`resources/clipboard-read.darwin.js` is an out-of-process JXA reader that emits a small JSON
+payload; `src/paste.ts` is the only module with business branching, and everything it decides not to
+handle falls through to the terminal's own paste. Transfers go through `workspace.fs` with a URI
+borrowed from the window, which is why no backend-specific code exists.
 
 Adding a reader for another platform means writing a new program that emits the same JSON contract
 (see `src/clipboard/types.ts`) plus a thin host wrapper alongside `src/clipboard/darwin.ts`. The
-readers share no code — the platform APIs have nothing in common — only the contract.
+readers share no code — the platform APIs have nothing in common — only the contract. They live in
+`resources/`, one file per platform, and ship as plain files: a reader is handed to its interpreter
+by path, so bundling it would defeat the point. `media/` would be the wrong home for the same
+reason — by convention that directory holds webview assets, and this extension has no webview.
 
 ## Before re-adding the Windows or Linux keybinding
 
