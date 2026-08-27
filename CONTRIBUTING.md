@@ -68,8 +68,8 @@ manifest strings resolved, install the packaged vsix.
 `scripts/build.mjs` produces everything shipped that is not checked in:
 
 - **`dist/build/extension.js`** — the whole extension bundled and minified by esbuild into one
-  CommonJS file, about 19 KB against roughly 70 KB of unbundled `tsc` output. `vscode` stays
-  external because the host provides it; nothing else is imported beyond node builtins. The source
+  CommonJS file. `vscode` stays external because the host provides it; nothing else is imported
+  beyond node builtins. The source
   map is written as `sourcemap: 'external'`, so it exists locally for symbolicating stack traces but
   is neither packaged nor referenced from the shipped bundle.
 - **`dist/build/icon.png`** — 256×256, because the Marketplace and the Extensions view accept raster

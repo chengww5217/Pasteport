@@ -5,8 +5,8 @@
 </p>
 
 <p align="center">
-  <a href="https://marketplace.visualstudio.com/items?itemName=chengww.pasteport"><img src="https://badgen.net/vs-marketplace/v/chengww.pasteport?label=VS%20Code%20Marketplace" alt="VS Code Marketplace 版本" /></a>
-  <a href="https://open-vsx.org/extension/chengww/pasteport"><img src="https://img.shields.io/open-vsx/v/chengww/pasteport?label=Open%20VSX" alt="Open VSX 版本" /></a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=chengww.pasteport"><img src="https://badgen.net/vs-marketplace/v/chengww.pasteport?label=VS%20Code%20Marketplace&color=2249B8&labelColor=1B2130" alt="VS Code Marketplace 版本" /></a>
+  <a href="https://open-vsx.org/extension/chengww/pasteport"><img src="https://img.shields.io/open-vsx/v/chengww/pasteport?label=Open%20VSX&color=2249B8&labelColor=1B2130" alt="Open VSX 版本" /></a>
 </p>
 
 <p align="center">
@@ -16,8 +16,8 @@
   <a href="README.ja.md">日本語</a>
 </p>
 
-在 VS Code **远程窗口**的终端里按下粘贴键，本机剪贴板中的图片或文件就会被送到远程主机 —— 随后
-**远程路径**被写入你的提示符，命令行 AI 助手可以直接读取。
+在 VS Code **远程窗口**的终端里按下粘贴键，本机剪贴板里的图片或文件就会传到远程主机 —— 随后
+**远程路径**写进提示符，命令行 AI 助手可以直接读取。
 
 ```
 $ /tmp/pasteport/9f2c1a4b7e0d3856/clipboard.png
@@ -28,7 +28,7 @@ $ /tmp/pasteport/9f2c1a4b7e0d3856/clipboard.png
   <img src="../assets/demo.gif" alt="演示：截图后在远程终端里按下粘贴键，图片被上传，远程路径插入提示符" width="800" />
 </p>
 
-本地窗口里什么都不会变：按键会被原样交还给终端，所以这个快捷键可以放心地一直绑着。
+本地窗口里一切照旧：按键会直接传给终端，所以这个快捷键绑定留在任何窗口都不碍事。
 
 ## 它能处理什么
 
@@ -52,8 +52,8 @@ $ /tmp/pasteport/9f2c1a4b7e0d3856/clipboard.png
 
 ## 远程后端
 
-传输走 VS Code 已经建立好的连接：使用 `workspace.fs`，并借用窗口本身的一个 URI。scheme 与 authority
-都沿用它，因此所有后端走的是同一条代码路径，不存在需要维护的分后端逻辑。
+传输走 VS Code 已经建立好的连接：使用 `workspace.fs`，URI 直接借用窗口本身的，scheme 和 authority
+也随之继承。因此所有后端走的是同一条代码路径，不存在需要按后端维护的分支逻辑。
 
 | 后端                 | 状态               |
 | -------------------- | ------------------ |
@@ -96,7 +96,7 @@ $ /tmp/pasteport/9f2c1a4b7e0d3856/clipboard.png
 ### 去重
 
 文件落在 `<remoteDir>/<fingerprint>/<原文件名>`。上传前会用一次 `stat` 检查目标：如果它已经在那里且大小
-正确，就不传输任何字节，直接插入已有路径。第二次粘贴同一张截图只花一个往返。
+正确，就不传输任何字节，直接插入已有路径。第二次粘贴同一张截图，只花一次往返。
 
 指纹在 8 MB 以内是内容哈希（SHA-256），超过则是 `size:mtime:name` —— 对几百 MB 做哈希的代价，比它消除的
 碰撞风险更大。
@@ -107,8 +107,11 @@ $ /tmp/pasteport/9f2c1a4b7e0d3856/clipboard.png
 是路径出现在你的提示符里。
 
 如果预计耗时超过 `pasteport.confirmAboveSeconds`（默认 5 秒），会先征求你的同意，随后进度会移到带取消
-按钮的通知里。这个预计值来自你链路上实测的吞吐，因此阈值会自适应，而不是靠猜一个字节数。任何时候都可以
-使用命令 `Pasteport: Cancel Transfer`。
+按钮的通知里。这个预计值来自你链路上实测的吞吐，因此阈值会自适应，而不是靠猜一个字节数。也可以
+随时执行 `Pasteport: Cancel Transfer` 命令。
+
+取消是在文件之间生效，而不是在文件中途 —— `workspace.fs.writeFile` 没有取消点，所以已经在传输的大文件
+会先传完。
 
 ### 清理
 
@@ -120,7 +123,7 @@ $ /tmp/pasteport/9f2c1a4b7e0d3856/clipboard.png
 里面的内容。`Pasteport: Diagnose` 会打印确切路径。
 
 清理只会删除名字符合扩展自身指纹格式（16 个十六进制字符）的目录，以及符合自身命名规则的暂存图片。
-`remoteDir` 下的其他内容只会被计数并原样留下，因此把这个设置指向一个共享目录，也不会让清理造成连带损害。
+`remoteDir` 下的其他内容只会被数一遍、不会动，所以即使把设置指向一个共享目录，清理也不会误伤别人的文件。
 
 ## 命令
 
@@ -131,19 +134,19 @@ $ /tmp/pasteport/9f2c1a4b7e0d3856/clipboard.png
 | `Pasteport: Clean Up Remote Files`      | 立即执行一次过期清理               |
 | `Pasteport: Diagnose`                   | 把环境信息和一次剪贴板探测写入日志 |
 
-如果哪里不对，先运行 `Pasteport: Diagnose` —— 它会报告一次成功粘贴所依赖的每个条件，这让问题反馈容易
-处理得多。
+如果哪里不对，先运行 `Pasteport: Diagnose` —— 它会把一次成功粘贴所依赖的每个条件都报告出来，附上它
+再报 bug，问题要容易排查得多。
 
 ## 设置
 
-| 设置项                          | 默认值   | 说明                                                 |
-| ------------------------------- | -------- | ---------------------------------------------------- |
-| `pasteport.remoteDir`           | _(留空)_ | 远程主机上的绝对 POSIX 目录；留空表示自动检测        |
-| `pasteport.quoting`             | `auto`   | `auto`、`shell`（为特殊字符加引号）或 `none`（原样） |
-| `pasteport.trailingSpace`       | `true`   | 在插入的路径后加一个空格                             |
-| `pasteport.confirmAboveSeconds` | `5`      | 预计耗时超过该秒数则先询问；`0` 表示从不询问         |
-| `pasteport.ttlHours`            | `24`     | 粘贴的文件保留多少小时后被清理；`0` 表示禁用         |
-| `pasteport.bracketedPaste`      | `false`  | 用括号粘贴标记包裹插入内容                           |
+| 设置项                          | 默认值   | 说明                                                  |
+| ------------------------------- | -------- | ----------------------------------------------------- |
+| `pasteport.remoteDir`           | _(留空)_ | 远程主机上的绝对 POSIX 目录；留空表示自动检测         |
+| `pasteport.quoting`             | `auto`   | `auto`、`shell`（为特殊字符加引号）或 `none`（原样）  |
+| `pasteport.trailingSpace`       | `true`   | 在插入的路径后加一个空格                              |
+| `pasteport.confirmAboveSeconds` | `5`      | 预计耗时超过该秒数则先询问；`0` 表示从不询问          |
+| `pasteport.ttlHours`            | `24`     | 粘贴的文件保留多少小时后被清理；`0` 表示禁用          |
+| `pasteport.bracketedPaste`      | `false`  | 用括号粘贴标记（`ESC[200~` … `ESC[201~`）包裹插入内容 |
 
 `pasteport.remoteDir` 是用户级设置，和其他用户设置一样，可以被你打开的工作区覆盖。它的值会直接写进
 你的终端，所以克隆来的仓库也能决定你的粘贴落到哪里——请只在你信任的工作区里粘贴。`~` 不会被展开 ——
@@ -154,25 +157,29 @@ $ /tmp/pasteport/9f2c1a4b7e0d3856/clipboard.png
 留空时，`pasteport.remoteDir` 会从远程主机上问出来，而不是假定为 `/tmp`：主机完全有权把 `TMPDIR` 指到
 别处，而给 AI 助手读的临时文件，就该待在那台主机认定的临时文件位置。
 
-扩展没有办法在远程侧执行命令 —— 它活在本地扩展宿主里。它有的是 `workspace.fs`，其读取由远程服务器进程
-提供，因此 `/proc/self/environ` 就是那个进程自己的环境。而该服务器是从你的登录环境启动的，所以它的
-`TMPDIR` 正是主机实际配置的值。解析顺序：
+扩展不能在远程侧执行命令 —— 它运行在本地扩展宿主里。它能用的只有 `workspace.fs`，而每次读取都由远程
+服务器进程处理，因此 `/proc/self/environ` 就是那个进程自己的环境。它又是从你的登录环境启动的，所以
+它的 `TMPDIR` 正是主机实际配置的值。解析顺序：
 
 1. 远程服务器环境中的 `TMPDIR`，其次 `TMP`，再次 `TEMP` —— 适用于 Linux 远端，也就是 SSH 到 Linux、
    Dev Containers、WSL、Tunnels 和 Codespaces。
 2. `/tmp` 与 `/var/tmp` 中第一个存在的 —— 适用于没有 procfs 的远端，比如 macOS。
 3. `/tmp`，同时在日志中记录一条警告。
 
-然后文件会落在所选目录下的 `pasteport` 子目录中，写入和清理也只涉及这个子目录。结果每台主机记录一次日志，
-并由 `Pasteport: Diagnose` 报告，所以粘贴去了哪里从来不是问题。显式设置该值则完全跳过检测。
+然后文件会落在所选目录下的 `pasteport` 子目录中，写入和清理也只涉及这个子目录。每个主机只会记录一次
+检测结果，`Pasteport: Diagnose` 也会报告，所以粘贴去了哪里从来不用猜。显式设置该值则完全跳过检测。
 
 有两件事它解决不了。在与他人共用的远程主机上，`TMPDIR` 通常就是 `/tmp`，于是 `/tmp/pasteport` 属于第一个
 粘贴的人，之后的用户会遇到权限错误 —— 请把 `pasteport.remoteDir` 设到你自己的位置，比如家目录下面。另外，
-检测假定远端是 POSIX 系统：所有受支持的后端都是 Linux 或 macOS，而 Windows 远端需要的是这里任何部分都不
-理解的路径形式。
+检测假定远端是 POSIX 系统：目前支持的每个后端都是 Linux 或 macOS；Windows 远端用的是 Windows 路径风格，
+这套逻辑完全不认识。
 
-关于 `quoting`：目标是把你的输入当作纯文本处理的 TUI 助手，在那里一个引号会变成路径的一部分，并悄悄让它
-失效。所以 `auto` 目前是原样插入路径。如果你主要是粘给会解析这行内容的 shell，请选 `shell`。
+关于 `quoting`：使用场景是会把输入当作纯文本接收的 TUI 助手，在那里引号会被当成路径的一部分，悄悄把
+路径弄坏。所以 `auto` 目前是原样插入路径。如果你主要是粘给会解析这行内容的 shell，请选 `shell`。
+
+关于 `bracketedPaste`：理解括号粘贴的 TUI 会把包裹的内容当作一次粘贴而不是按键 —— 不自动缩进、不把其中
+的换行立即当作命令执行。如果你的助手界面会把插入的路径弄坏，可以开启它。默认关闭，因为各 TUI 的兼容性
+尚未验证。
 
 ## 快捷键
 
@@ -187,8 +194,8 @@ $ /tmp/pasteport/9f2c1a4b7e0d3856/clipboard.png
 
 在 Windows 和 Linux 上，终端获得焦点时按下的键通常会直接发给 shell，因此 `pasteport.paste` 被加入了
 `terminal.integrated.commandsToSkipShell` —— 这个列表是叠加在 VS Code 内置列表之上的，你原有的习惯不会
-改变。如果你在自己的设置里写了 `commandsToSkipShell` 数组，它会替换默认值，此时扩展会提议为你添加一次
-这一项。
+改变。如果你在自己的设置里写了 `commandsToSkipShell` 数组，它会替换默认值 —— 此时扩展会提议帮你补上
+这一项，只提示一次。
 
 想换别的键，在键盘快捷方式里重新绑定 `pasteport.paste` 即可。
 
@@ -197,11 +204,11 @@ $ /tmp/pasteport/9f2c1a4b7e0d3856/clipboard.png
 三个读取器是彼此独立的程序，除了一份很小的 JSON 约定之外没有共用代码 —— 因为这些平台的 API 本身也毫无
 共同之处。
 
-| 客户端  | 读取器                                      | 状态                                            |
-| ------- | ------------------------------------------- | ----------------------------------------------- |
-| macOS   | `osascript`（JXA）调用 AppKit               | 已在真机验证：截图、仅 TIFF 的复制、Finder 文件 |
-| Windows | `powershell -STA` 调用 System.Windows.Forms | 在 Windows CI runner 上运行；尚未在真实桌面验证 |
-| Linux   | `wl-paste`（Wayland）/ `xclip`（X11）       | 格式处理有单元测试；尚未在真实桌面验证          |
+| 客户端  | 读取器                                      | 状态                                                      |
+| ------- | ------------------------------------------- | --------------------------------------------------------- |
+| macOS   | `osascript`（JXA）调用 AppKit               | 已在真机验证：截图、只带 TIFF 格式的复制内容、Finder 文件 |
+| Windows | `powershell -STA` 调用 System.Windows.Forms | 在 Windows CI runner 上运行；尚未在真实桌面验证           |
+| Linux   | `wl-paste`（Wayland）/ `xclip`（X11）       | 格式处理有单元测试；尚未在真实桌面验证                    |
 
 有两点确实还没测：PowerShell 的启动比 `osascript` 慢一个数量级，而这份开销落在每一次粘贴上；扩展在超过
 150ms 时会记录警告，所以如果 Windows 上的输入手感发滞，日志会告诉你，届时读取器需要改成常驻进程。另外，

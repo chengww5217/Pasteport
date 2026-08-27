@@ -7,8 +7,8 @@
 <!-- icon:end -->
 
 <p align="center">
-  <a href="https://marketplace.visualstudio.com/items?itemName=chengww.pasteport"><img src="https://badgen.net/vs-marketplace/v/chengww.pasteport?label=VS%20Code%20Marketplace" alt="VS Code Marketplace version" /></a>
-  <a href="https://open-vsx.org/extension/chengww/pasteport"><img src="https://img.shields.io/open-vsx/v/chengww/pasteport?label=Open%20VSX" alt="Open VSX version" /></a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=chengww.pasteport"><img src="https://badgen.net/vs-marketplace/v/chengww.pasteport?label=VS%20Code%20Marketplace&color=2249B8&labelColor=1B2130" alt="VS Code Marketplace version" /></a>
+  <a href="https://open-vsx.org/extension/chengww/pasteport"><img src="https://img.shields.io/open-vsx/v/chengww/pasteport?label=Open%20VSX&color=2249B8&labelColor=1B2130" alt="Open VSX version" /></a>
 </p>
 
 <p align="center">
@@ -69,7 +69,7 @@ path and there is no per-backend logic to maintain.
 | WSL                  | Expected to work, not yet verified |
 | Tunnels / Codespaces | Expected to work, not yet verified |
 
-The unverified rows are honest about it: the same code path is used, but only SSH has been measured
+The unverified rows mean exactly that: the same code path is used, but only SSH has been measured
 and exercised. Reports from the other backends are welcome.
 
 ## How it works
@@ -125,6 +125,9 @@ you are asked first, and then progress moves to a notification with a cancel but
 comes from the throughput actually measured on your link, so the threshold adapts instead of
 guessing at a byte count. `Pasteport: Cancel Transfer` is available as a command at any time.
 
+Cancelling stops the transfer between files rather than mid-file — `workspace.fs.writeFile` has no
+cancellation point, so a large file already in flight finishes first.
+
 ### Cleanup
 
 Uploaded files and locally staged images older than `pasteport.ttlHours` (24 by default) are
@@ -154,14 +157,14 @@ paste depends on, which makes a bug report much easier to act on.
 
 ## Settings
 
-| Setting                         | Default   | Description                                                        |
-| ------------------------------- | --------- | ------------------------------------------------------------------ |
-| `pasteport.remoteDir`           | _(empty)_ | Absolute POSIX directory on the remote host; empty means detect it |
-| `pasteport.quoting`             | `auto`    | `auto`, `shell` (quote special characters) or `none` (verbatim)    |
-| `pasteport.trailingSpace`       | `true`    | Append a space after the inserted path                             |
-| `pasteport.confirmAboveSeconds` | `5`       | Ask before transfers estimated to take longer; `0` never asks      |
-| `pasteport.ttlHours`            | `24`      | Age at which pasted files are cleaned up; `0` disables             |
-| `pasteport.bracketedPaste`      | `false`   | Wrap the insertion in bracketed paste markers                      |
+| Setting                         | Default   | Description                                                             |
+| ------------------------------- | --------- | ----------------------------------------------------------------------- |
+| `pasteport.remoteDir`           | _(empty)_ | Absolute POSIX directory on the remote host; empty means detect it      |
+| `pasteport.quoting`             | `auto`    | `auto`, `shell` (quote special characters) or `none` (verbatim)         |
+| `pasteport.trailingSpace`       | `true`    | Append a space after the inserted path                                  |
+| `pasteport.confirmAboveSeconds` | `5`       | Ask before transfers estimated to take longer; `0` never asks           |
+| `pasteport.ttlHours`            | `24`      | Age at which pasted files are cleaned up; `0` disables                  |
+| `pasteport.bracketedPaste`      | `false`   | Wrap the insertion in bracketed paste markers (`ESC[200~` … `ESC[201~`) |
 
 `pasteport.remoteDir` is a user setting, and like any user setting it can be overridden by the
 workspace you have open. The value is written into your terminal, so a repository you clone can
@@ -201,6 +204,11 @@ About `quoting`: the target is a TUI agent that treats your input as literal tex
 character becomes part of the path and silently breaks it. `auto` therefore inserts paths verbatim
 today. Choose `shell` if you mainly paste into a shell that will parse the line.
 
+About `bracketedPaste`: a TUI that understands bracketed paste treats the wrapped text as a paste
+rather than as keystrokes — no auto-indent, no running an embedded newline as a command. Enable it
+if your agent's interface mangles an inserted path. It is off by default because compatibility
+across TUIs is unverified.
+
 ## Keybinding
 
 Each platform's own terminal paste key is used, and only while the terminal has focus. The key
@@ -231,7 +239,7 @@ the platform APIs have nothing in common either.
 | Windows | `powershell -STA` into System.Windows.Forms | Runs in CI on a Windows runner; not yet exercised on a real desktop    |
 | Linux   | `wl-paste` (Wayland) / `xclip` (X11)        | Format handling is unit tested; not yet exercised on a real desktop    |
 
-Two things are honestly unmeasured. PowerShell starts an order of magnitude more slowly than
+Two things remain unmeasured. PowerShell starts an order of magnitude more slowly than
 `osascript`, and that cost lands on every paste; the extension logs a warning above 150ms, so if
 Windows input feels sluggish the log will say so and the reader will need to become a resident
 process. And neither the Windows nor the Linux reader has been driven by a human on a real desktop

@@ -5,8 +5,8 @@
 </p>
 
 <p align="center">
-  <a href="https://marketplace.visualstudio.com/items?itemName=chengww.pasteport"><img src="https://badgen.net/vs-marketplace/v/chengww.pasteport?label=VS%20Code%20Marketplace" alt="VS Code Marketplace のバージョン" /></a>
-  <a href="https://open-vsx.org/extension/chengww/pasteport"><img src="https://img.shields.io/open-vsx/v/chengww/pasteport?label=Open%20VSX" alt="Open VSX のバージョン" /></a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=chengww.pasteport"><img src="https://badgen.net/vs-marketplace/v/chengww.pasteport?label=VS%20Code%20Marketplace&color=2249B8&labelColor=1B2130" alt="VS Code Marketplace のバージョン" /></a>
+  <a href="https://open-vsx.org/extension/chengww/pasteport"><img src="https://img.shields.io/open-vsx/v/chengww/pasteport?label=Open%20VSX&color=2249B8&labelColor=1B2130" alt="Open VSX のバージョン" /></a>
 </p>
 
 <p align="center">
@@ -108,7 +108,7 @@ scp も同じ回線を通り同じ上限を継ぎますから、加えても速�
 2 度目に貼るコストは 1 往復です。
 
 フィンガープリントは 8 MB までは内容のハッシュ (SHA-256)、それを超えると `size:mtime:name` です。数百 MB
-をハッシュする費用は、それで消せる衝突のリスクより大きくなります。
+をハッシュするコストは、それで消せる衝突のリスクより大きいためです。
 
 ### 進捗とキャンセル
 
@@ -118,6 +118,9 @@ scp も同じ回線を通り同じ上限を継ぎますから、加えても速�
 `pasteport.confirmAboveSeconds` (既定 5 秒) を超えると見積もられた転送は、先に確認を取り、そのあと進捗は
 キャンセルボタン付きの通知に移ります。見積もりはあなたの回線で実測したスループットから出るので、バイト数を
 当てるのではなく閾値のほうが適応します。コマンド `Pasteport: Cancel Transfer` はいつでも使えます。
+
+キャンセルはファイルの途中ではなく、ファイルとファイルの間で効きます。`workspace.fs.writeFile` には
+キャンセルポイントがないため、送信中の大きなファイルはまず最後まで送られます。
 
 ### 後片付け
 
@@ -130,8 +133,8 @@ scp も同じ回線を通り同じ上限を継ぎますから、加えても速�
 `Pasteport: Diagnose` が正確なパスを表示します。
 
 削除の対象は、拡張機能自身のフィンガープリント形式 (16 桁の 16 進数) に一致する名前のディレクトリと、自身の
-命名規則に一致する一時画像だけです。`remoteDir` の下のそれ以外は数えるだけで手を付けないので、この設定を
-共有ディレクトリに向けても後片付けが巻き添えの被害になることはありません。
+命名規則に一致する一時画像だけです。`remoteDir` の下のそれ以外は数を数えるだけで触らないので、この設定を
+共有ディレクトリに向けても、後片付けが他のファイルを巻き込むことはありません。
 
 ## コマンド
 
@@ -147,14 +150,14 @@ scp も同じ回線を通り同じ上限を継ぎますから、加えても速�
 
 ## 設定
 
-| 設定                            | 既定値  | 説明                                                       |
-| ------------------------------- | ------- | ---------------------------------------------------------- |
-| `pasteport.remoteDir`           | _(空)_  | リモートホスト上の絶対 POSIX ディレクトリ。空なら自動検出  |
-| `pasteport.quoting`             | `auto`  | `auto`、`shell` (特殊文字を引用) または `none` (そのまま)  |
-| `pasteport.trailingSpace`       | `true`  | 挿入したパスの後ろに空白を追加                             |
-| `pasteport.confirmAboveSeconds` | `5`     | 見積もりがこの秒数を超える転送は先に確認。`0` で確認しない |
-| `pasteport.ttlHours`            | `24`    | 貼り付けたファイルを片付けるまでの時間。`0` で無効         |
-| `pasteport.bracketedPaste`      | `false` | 挿入をブラケットペーストのマーカーで囲む                   |
+| 設定                            | 既定値  | 説明                                                               |
+| ------------------------------- | ------- | ------------------------------------------------------------------ |
+| `pasteport.remoteDir`           | _(空)_  | リモートホスト上の絶対 POSIX ディレクトリ。空なら自動検出          |
+| `pasteport.quoting`             | `auto`  | `auto`、`shell` (特殊文字を引用) または `none` (そのまま)          |
+| `pasteport.trailingSpace`       | `true`  | 挿入したパスの後ろに空白を追加                                     |
+| `pasteport.confirmAboveSeconds` | `5`     | 見積もりがこの秒数を超える転送は先に確認。`0` で確認しない         |
+| `pasteport.ttlHours`            | `24`    | 貼り付けたファイルを片付けるまでの時間。`0` で無効                 |
+| `pasteport.bracketedPaste`      | `false` | 挿入をブラケットペースト マーカー (`ESC[200~` … `ESC[201~`) で囲む |
 
 `pasteport.remoteDir` はユーザー設定であり、他のユーザー設定と同様に、開いているワークスペースから上書きできます。値はあなたのターミナルに書き込まれるため、クローンしたリポジトリが貼り付け先を決めることもできます — 信頼できるワークスペースでのみ貼り付けてください。
 `~` は展開されません — `workspace.fs` はそれを解決しないため、文字どおり `~` という名前のディレクトリが
@@ -166,8 +169,8 @@ scp も同じ回線を通り同じ上限を継ぎますから、加えても速�
 を別の場所へ向ける権利は当然あり、エージェントに読ませる使い捨てのファイルは、そのホストが使い捨てファイル
 の置き場所だと言う場所に属します。
 
-拡張機能にはリモート側でコマンドを実行する手段がありません — ローカル拡張ホストに住んでいるからです。持って
-いるのは `workspace.fs` で、その読み取りはリモートのサーバープロセスが処理します。したがって
+拡張機能にはリモート側でコマンドを実行する手段がありません — ローカル拡張ホストで動いているからです。使える
+のは `workspace.fs` だけで、その読み取りはリモートのサーバープロセスが処理します。したがって
 `/proc/self/environ` はそのプロセス自身の環境です。サーバーはあなたのログイン環境から起動されているので、
 その `TMPDIR` こそホストが実際に設定した値です。解決の順序:
 
@@ -184,11 +187,16 @@ scp も同じ回線を通り同じ上限を継ぎますから、加えても速�
 ので、`/tmp/pasteport` は最初に貼り付けた人のものになり、次の利用者は権限エラーになります —
 `pasteport.remoteDir` を自分の場所、たとえばホームディレクトリの下に設定してください。もう 1 つ、検出は
 リモートが POSIX であることを前提にします。対応しているバックエンドはすべて Linux か macOS で、Windows の
-リモートはこのどの部分も理解しないパス形式を必要とします。
+リモートが使う Windows 形式のパスは、この仕組みのどの部分も扱えません。
 
-`quoting` について: 想定している相手は入力をそのままのテキストとして扱う TUI エージェントで、そこでは引用符
-がパスの一部になり、黙ってパスを壊します。そのため `auto` は現在パスをそのまま挿入します。行を解釈する
+`quoting` について: 想定している相手は、入力をそのままのテキストとして扱う TUI エージェントです。そこでは
+引用符もパスの一部になり、パスを黙って壊してしまいます。そのため `auto` は現在パスをそのまま挿入します。行を解釈する
 シェルに貼ることが主なら `shell` を選んでください。
+
+`bracketedPaste` について: ブラケットペーストを理解する TUI は、囲まれたテキストをキー入力ではなく
+ペーストとして扱います。自動インデントをせず、含まれる改行をその場でコマンドとして実行もしません。
+エージェントのインターフェースが挿入されたパスを壊してしまう場合に有効にしてください。TUI 間の互換性が
+未検証のため、既定ではオフです。
 
 ## キーバインド
 
