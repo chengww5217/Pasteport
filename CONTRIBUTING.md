@@ -169,10 +169,12 @@ Adding a language means one file in each half, and both must be added together �
 stale, or if a translation drops a `{0}` placeholder. Locale names follow VS Code's own display
 languages, lowercased: `zh-cn`, `pt-br`, and so on.
 
-Translated READMEs live in `docs/README.<locale>.md` and are excluded from the vsix; the Marketplace
-shows the English one. They cover a subset of the interface languages on purpose — a README is prose
-that has to be kept in step with the code, not a string table — and the test requires each one to be
-a language the extension itself is translated into.
+Translated documentation lives in `docs/README.<locale>.md` and `docs/CHANGELOG.<locale>.md`, both
+excluded from the vsix; the Marketplace shows the English ones. They cover a subset of the interface
+languages on purpose — documentation is prose that has to be kept in step with the code, not a string
+table — and the test requires each one to be a language the extension itself is translated into, a
+README and a changelog to exist together for every documented locale, and the English original to
+link to each translation from its language switcher.
 
 ## Releasing
 

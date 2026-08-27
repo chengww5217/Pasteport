@@ -88,6 +88,16 @@ function nlsTranslations(): string[] {
     .sort();
 }
 
+/** The locales a `docs/<document>.<locale>.md` set is translated into, lowercased. */
+function documentLocales(files: string[], document: string): string[] {
+  const pattern = new RegExp(`^${document}\\.(.+)\\.md$`);
+
+  return files
+    .flatMap((file) => pattern.exec(file)?.[1] ?? [])
+    .map((locale) => locale.toLowerCase())
+    .sort();
+}
+
 test('every localised string in the source is in the English bundle', () => {
   const english = readJson(path.join(L10N_DIR, 'bundle.l10n.json'));
   const requested = requestedKeys();
@@ -185,20 +195,41 @@ test('the same set of languages is offered by both halves of the UI', () => {
   assert.deepEqual(bundleLocales, manifestLocales);
 });
 
-test('every translated language has a documented README, or none does', () => {
-  // The docs are translated into a subset of the UI languages on purpose — a
-  // README is prose, not a string table — but a link that goes nowhere is a bug.
-  const readmes = fs
-    .readdirSync(path.join(ROOT, 'docs'))
-    .filter((name) => /^README\..+\.md$/.test(name));
+test('every translated document is a language the extension itself is translated into', () => {
+  // The docs are translated into a subset of the UI languages on purpose — prose is
+  // not a string table — but a link that goes nowhere is a bug.
+  const files = fs.readdirSync(path.join(ROOT, 'docs'));
+  const readmes = documentLocales(files, 'README');
+  const changelogs = documentLocales(files, 'CHANGELOG');
 
   assert.ok(readmes.length > 0, 'docs/ has no translated README');
 
-  for (const name of readmes) {
-    const locale = name.replace(/^README\.(.+)\.md$/, '$1').toLowerCase();
+  // A locale with one document but not the other reads as a half-finished
+  // translation: the reader follows a language link and lands back in English.
+  assert.deepEqual(
+    changelogs,
+    readmes,
+    'docs/README.* and docs/CHANGELOG.* cover different locales'
+  );
+
+  for (const locale of readmes) {
     assert.ok(
       fs.existsSync(path.join(NLS_DIR, `package.nls.${locale}.json`)),
-      `docs/${name} is a language the extension itself is not translated into`
+      `docs/ documents ${locale}, a language the extension itself is not translated into`
     );
+  }
+});
+
+test('the English documents link to every translation of themselves', () => {
+  // The language switcher at the top of each document is written by hand, so a
+  // translation nothing points at is a file nobody finds.
+  const files = fs.readdirSync(path.join(ROOT, 'docs'));
+
+  for (const document of ['README', 'CHANGELOG']) {
+    const english = fs.readFileSync(path.join(ROOT, `${document}.md`), 'utf8');
+
+    for (const file of files.filter((name) => name.startsWith(`${document}.`))) {
+      assert.ok(english.includes(`docs/${file}`), `${document}.md does not link to docs/${file}`);
+    }
   }
 });

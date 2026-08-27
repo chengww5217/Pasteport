@@ -1,5 +1,12 @@
 # Changelog
 
+<p align="center">
+  <strong>English</strong> ·
+  <a href="https://github.com/chengww5217/pasteport/blob/main/docs/CHANGELOG.zh-CN.md">简体中文</a> ·
+  <a href="https://github.com/chengww5217/pasteport/blob/main/docs/CHANGELOG.zh-TW.md">繁體中文</a> ·
+  <a href="https://github.com/chengww5217/pasteport/blob/main/docs/CHANGELOG.ja.md">日本語</a>
+</p>
+
 All notable changes to this project are documented here.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
@@ -15,8 +22,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   notifications from `l10n/bundle.l10n.*.json`. Log output stays English on purpose: it is what a bug
   report carries.
 - Translated documentation: `docs/README.zh-CN.md`, `docs/README.zh-TW.md` and `docs/README.ja.md`,
-  linked from the top of every README. They are excluded from the vsix, where the Marketplace shows
-  the English one.
+  with a matching changelog in each language under `docs/CHANGELOG.<locale>.md`, linked from the top
+  of every README and changelog. They are excluded from the vsix, where the Marketplace shows the
+  English ones.
 - `Pasteport: Show Resolved Remote Directory`, which reports the directory a paste will actually use;
   the `pasteport.remoteDir` setting description carries a link to it, right next to the input field.
 

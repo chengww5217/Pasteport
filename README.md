@@ -13,9 +13,9 @@
 
 <p align="center">
   <strong>English</strong> ·
-  <a href="https://github.com/chengww5217/Pasteport/blob/main/docs/README.zh-CN.md">简体中文</a> ·
-  <a href="https://github.com/chengww5217/Pasteport/blob/main/docs/README.zh-TW.md">繁體中文</a> ·
-  <a href="https://github.com/chengww5217/Pasteport/blob/main/docs/README.ja.md">日本語</a>
+  <a href="https://github.com/chengww5217/pasteport/blob/main/docs/README.zh-CN.md">简体中文</a> ·
+  <a href="https://github.com/chengww5217/pasteport/blob/main/docs/README.zh-TW.md">繁體中文</a> ·
+  <a href="https://github.com/chengww5217/pasteport/blob/main/docs/README.ja.md">日本語</a>
 </p>
 
 Press the paste key in the terminal of a VS Code **remote window** and the image or files on your
