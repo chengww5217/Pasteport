@@ -60,19 +60,15 @@ export async function offerPackageInstall(
   });
   const rendered = renderCommand(command, args);
 
-  const install = vscode.l10n.t('Install');
-  const show = vscode.l10n.t('Show Command');
+  const install = vscode.l10n.t('pasteport.install.install');
+  const show = vscode.l10n.t('pasteport.install.showCommand');
   const choice = await vscode.window.showWarningMessage(
-    vscode.l10n.t('Pasteport: {0}', reason),
+    vscode.l10n.t('pasteport.common.prefixedMessage', reason),
     {
       modal: true,
       // The exact command, verbatim: this runs as root on the user's machine and
       // they are entitled to read it before agreeing, not after.
-      detail: vscode.l10n.t(
-        'Install it with {0}? Pasteport will run:\n\n{1}\n\nYour desktop will ask for authentication.',
-        manager.id,
-        rendered
-      ),
+      detail: vscode.l10n.t('pasteport.install.confirm', manager.id, rendered),
     },
     install,
     show
@@ -109,7 +105,7 @@ async function runInstall(
   const failure = await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
-      title: vscode.l10n.t('Pasteport: installing {0}', packages.join(' ')),
+      title: vscode.l10n.t('pasteport.install.inProgress', packages.join(' ')),
       cancellable: false,
     },
     async (): Promise<string | undefined> => {
@@ -135,16 +131,16 @@ async function runInstall(
   if (failure === undefined) {
     log.info(`installed ${packages.join(' ')}`);
     void vscode.window.showInformationMessage(
-      vscode.l10n.t('Pasteport: installed {0}. Press paste again.', packages.join(' '))
+      vscode.l10n.t('pasteport.install.done', packages.join(' '))
     );
     return;
   }
 
   log.error(`install failed: ${failure}`);
-  const showCommand = vscode.l10n.t('Show Command');
-  const showLog = vscode.l10n.t('Show Log');
+  const showCommand = vscode.l10n.t('pasteport.install.showCommand');
+  const showLog = vscode.l10n.t('pasteport.common.showLog');
   const choice = await vscode.window.showErrorMessage(
-    vscode.l10n.t('Pasteport: could not install {0}.', packages.join(' ')),
+    vscode.l10n.t('pasteport.install.failed', packages.join(' ')),
     showCommand,
     showLog
   );
@@ -166,14 +162,14 @@ async function showManualInstructions(
 ): Promise<void> {
   const rendered =
     manager === undefined
-      ? `${vscode.l10n.t('<your package manager>')} install ${packages.join(' ')}`
+      ? `${vscode.l10n.t('pasteport.install.packageManagerPlaceholder')} install ${packages.join(' ')}`
       : renderCommand(...installArgv(manager, packages));
 
   log.info(`install ${packages.join(' ')} by running: ${rendered}`);
   log.show(true);
 
   await vscode.window.showInformationMessage(
-    vscode.l10n.t('Pasteport: run this in a local terminal — {0}', rendered)
+    vscode.l10n.t('pasteport.install.runManually', rendered)
   );
 }
 

@@ -352,7 +352,7 @@ function startTicker(
     const remaining = Math.max(0, estimate - elapsed);
     progress.report({
       message: vscode.l10n.t(
-        '{0} ({1}) — {2} elapsed, ~{3} left',
+        'pasteport.transfer.progress',
         source.remoteName,
         formatBytes(source.size),
         formatSeconds(elapsed),
@@ -367,12 +367,12 @@ function startTicker(
 }
 
 async function confirmSlowTransfer(bytes: number, seconds: number): Promise<boolean> {
-  const send = vscode.l10n.t('Send');
+  const send = vscode.l10n.t('pasteport.transfer.send');
   const choice = await vscode.window.showWarningMessage(
-    vscode.l10n.t('Send {0} to the remote host?', formatBytes(bytes)),
+    vscode.l10n.t('pasteport.transfer.confirmSend', formatBytes(bytes)),
     {
       modal: true,
-      detail: vscode.l10n.t('Estimated {0} at the last measured speed.', formatSeconds(seconds)),
+      detail: vscode.l10n.t('pasteport.transfer.estimate', formatSeconds(seconds)),
     },
     send
   );
@@ -391,13 +391,11 @@ function describeFsError(err: unknown): string {
   if (err instanceof vscode.FileSystemError) {
     switch (err.code) {
       case 'NoPermissions':
-        return vscode.l10n.t('the remote directory is not writable — check pasteport.remoteDir');
+        return vscode.l10n.t('pasteport.transfer.remoteDirNotWritable');
       case 'Unavailable':
-        return vscode.l10n.t(
-          'the remote connection is unavailable — reconnect the window and try again'
-        );
+        return vscode.l10n.t('pasteport.transfer.remoteUnavailable');
       default:
-        return vscode.l10n.t('remote write failed ({0}): {1}', err.code, err.message);
+        return vscode.l10n.t('pasteport.transfer.writeFailed', err.code, err.message);
     }
   }
   return describeError(err);

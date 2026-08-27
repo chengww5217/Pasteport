@@ -151,9 +151,10 @@ Everything translatable lives under `l10n/`, in two halves, because VS Code load
 
 - `l10n/nls/package.nls.json` and `l10n/nls/package.nls.<locale>.json` cover everything in
   `package.json` — command titles, setting descriptions. The manifest refers to them as `%key%`.
-- `l10n/bundle.l10n.json` and `l10n/bundle.l10n.<locale>.json` cover everything in the code. The key
-  **is** the English sentence, so `vscode.l10n.t('Send')` and the bundle entry must match character
-  for character.
+- `l10n/bundle.l10n.json` and `l10n/bundle.l10n.<locale>.json` cover everything in the code. Keys
+  are semantic identifiers — `pasteport.<feature>.<name>`, e.g. `'pasteport.transfer.confirmSend'` —
+  and `vscode.l10n.t('pasteport.transfer.confirmSend')` looks the sentence up in the bundle. The
+  English bundle maps each key to the English sentence; a translation maps it to its own.
 
 VS Code only reads `package.nls*.json` from the extension root, so `npm run build` copies `l10n/nls/`
 into `dist/package/` — the tree vsce packages — rather than into the repository root. Nothing

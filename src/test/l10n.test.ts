@@ -106,13 +106,26 @@ test('every localised string in the source is in the English bundle', () => {
 
   for (const key of requested) {
     assert.ok(key in english, `l10n/bundle.l10n.json is missing ${JSON.stringify(key)}`);
-    assert.equal(english[key], key, `the English bundle must map ${JSON.stringify(key)} to itself`);
+    const value = english[key];
+    assert.ok(value.trim() !== '', `l10n/bundle.l10n.json leaves ${JSON.stringify(key)} empty`);
+    // The English bundle holds the sentence that is shown when a locale is
+    // missing; a value that is also a key would render the key to the user.
+    assert.notEqual(value, key, `l10n/bundle.l10n.json leaves ${JSON.stringify(key)} untranslated`);
   }
 
   for (const key of Object.keys(english)) {
     // A stale key is not harmless: it is a string translators are still paying
     // for and reviewers still reading.
     assert.ok(requested.has(key), `l10n/bundle.l10n.json has an unused key: ${key}`);
+  }
+
+  // Keys are semantic identifiers, grouped by feature; a sentence-shaped key
+  // means a call site was pasted instead of named.
+  for (const key of Object.keys(english)) {
+    assert.ok(
+      /^pasteport\.[a-z][a-zA-Z0-9]*(\.[a-zA-Z][a-zA-Z0-9]*)+$/.test(key),
+      `keys must be pasteport.<feature>.<name>: ${key}`
+    );
   }
 });
 

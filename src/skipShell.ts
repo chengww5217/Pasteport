@@ -39,12 +39,10 @@ export async function ensurePasteKeyReachesExtension(
   );
   if (suppression.isSuppressed()) return;
 
-  const add = vscode.l10n.t('Add Setting');
-  const never = vscode.l10n.t("Don't Ask Again");
+  const add = vscode.l10n.t('pasteport.skipShell.addSetting');
+  const never = vscode.l10n.t('pasteport.skipShell.dontAskAgain');
   const choice = await vscode.window.showWarningMessage(
-    vscode.l10n.t(
-      'Pasteport: your terminal.integrated.commandsToSkipShell setting does not list pasteport.paste, so the paste key is sent to the shell and the extension never runs. Add it?'
-    ),
+    vscode.l10n.t('pasteport.skipShell.prompt'),
     add,
     never
   );

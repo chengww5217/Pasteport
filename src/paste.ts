@@ -79,10 +79,7 @@ export async function paste(deps: PasteDependencies): Promise<void> {
 
   if (!isWritableRemote(template)) {
     log.error(`remote file system "${template.scheme}" is not writable; cannot transfer`);
-    showFailure(
-      vscode.l10n.t('Pasteport: the remote file system ({0}) is not writable.', template.scheme),
-      log
-    );
+    showFailure(vscode.l10n.t('pasteport.paste.remoteFsNotWritable', template.scheme), log);
     return;
   }
 
@@ -92,7 +89,7 @@ export async function paste(deps: PasteDependencies): Promise<void> {
   // with nothing.
   if (vscode.window.terminals.length === 0) {
     log.warn('no terminal is open, nothing to insert into');
-    void vscode.window.showInformationMessage(vscode.l10n.t('Pasteport: open a terminal first.'));
+    void vscode.window.showInformationMessage(vscode.l10n.t('pasteport.paste.openTerminal'));
     return;
   }
 
@@ -104,7 +101,7 @@ export async function paste(deps: PasteDependencies): Promise<void> {
     sources = await describeSources(payload.paths, payload.kind);
   } catch (err) {
     log.error(`could not read the clipboard files: ${describeError(err)}`);
-    showFailure(vscode.l10n.t('Pasteport: could not read the files from the clipboard.'), log);
+    showFailure(vscode.l10n.t('pasteport.paste.readFailed'), log);
     return;
   }
 
@@ -127,7 +124,7 @@ export async function paste(deps: PasteDependencies): Promise<void> {
 
     case 'failed':
       log.error(`transfer failed: ${outcome.message}`);
-      showFailure(vscode.l10n.t('Pasteport: {0}', outcome.message), log);
+      showFailure(vscode.l10n.t('pasteport.common.prefixedMessage', outcome.message), log);
       return;
 
     case 'done': {
@@ -146,10 +143,7 @@ export async function paste(deps: PasteDependencies): Promise<void> {
         log,
       });
       if (!injected) {
-        showFailure(
-          vscode.l10n.t('Pasteport: files were transferred but the path could not be inserted.'),
-          log
-        );
+        showFailure(vscode.l10n.t('pasteport.paste.injectionFailed'), log);
       }
       return;
     }
@@ -248,9 +242,9 @@ function notifyActionableOnce(error: ClipboardError, log: Logger): void {
     return;
   }
 
-  const showLog = vscode.l10n.t('Show Log');
+  const showLog = vscode.l10n.t('pasteport.common.showLog');
   void vscode.window
-    .showWarningMessage(vscode.l10n.t('Pasteport: {0}', reason), showLog)
+    .showWarningMessage(vscode.l10n.t('pasteport.common.prefixedMessage', reason), showLog)
     .then((choice) => {
       if (choice === showLog) log.show(true);
     });
@@ -266,21 +260,16 @@ function notifyActionableOnce(error: ClipboardError, log: Logger): void {
 function describeClipboardError(error: ClipboardError): string {
   switch (error.code) {
     case 'noGraphicalSession':
-      return vscode.l10n.t(
-        'no graphical session was found, so the clipboard cannot be read (neither WAYLAND_DISPLAY nor DISPLAY is set)'
-      );
+      return vscode.l10n.t('pasteport.clipboard.noGraphicalSession');
     case 'clipboardToolMissing':
-      return vscode.l10n.t(
-        '{0} is not installed, so the clipboard cannot be read',
-        (error.tools ?? []).join(' or ')
-      );
+      return vscode.l10n.t('pasteport.clipboard.toolMissing', (error.tools ?? []).join(' or '));
     default:
       return error.message;
   }
 }
 
 function showFailure(message: string, log: Logger): void {
-  const showLog = vscode.l10n.t('Show Log');
+  const showLog = vscode.l10n.t('pasteport.common.showLog');
   void vscode.window.showErrorMessage(message, showLog).then((choice) => {
     if (choice === showLog) log.show(true);
   });

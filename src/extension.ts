@@ -83,7 +83,7 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('pasteport.cancelTransfer', () => {
       if (!transfer.cancelActive()) {
         void vscode.window.showInformationMessage(
-          vscode.l10n.t('Pasteport: no transfer in progress.')
+          vscode.l10n.t('pasteport.transfer.noneInProgress')
         );
       }
     }),
@@ -100,16 +100,14 @@ export function activate(context: vscode.ExtensionContext): void {
       const config = readConfig(log);
       const template = remoteTemplateUri();
       if (template === undefined || !isWritableRemote(template)) {
-        void vscode.window.showInformationMessage(
-          vscode.l10n.t('Pasteport: no remote window in this session; nothing resolved.')
-        );
+        void vscode.window.showInformationMessage(vscode.l10n.t('pasteport.remote.noWindow'));
         return;
       }
       const dir = await remoteDirs.resolve(template, config.remoteDir);
       void vscode.window.showInformationMessage(
         config.remoteDir === undefined
-          ? vscode.l10n.t('Pasteport: files land in "{0}" (auto-detected).', dir)
-          : vscode.l10n.t('Pasteport: files land in "{0}" (as configured).', dir)
+          ? vscode.l10n.t('pasteport.remote.landingAuto', dir)
+          : vscode.l10n.t('pasteport.remote.landingConfigured', dir)
       );
     })
   );
@@ -187,10 +185,7 @@ async function cleanUp(
   if (template === undefined) {
     if (interactive) {
       void vscode.window.showInformationMessage(
-        vscode.l10n.t(
-          'Pasteport: removed {0} staged file(s) locally. No remote target could be resolved in this window, so nothing was swept remotely.',
-          staging.removed
-        )
+        vscode.l10n.t('pasteport.sweep.localOnly', staging.removed)
       );
     }
     return;
@@ -205,12 +200,7 @@ async function cleanUp(
 
   if (interactive) {
     void vscode.window.showInformationMessage(
-      vscode.l10n.t(
-        'Pasteport: removed {0} remote and {1} local item(s) older than {2}h.',
-        remote.removed,
-        staging.removed,
-        config.ttlHours
-      )
+      vscode.l10n.t('pasteport.sweep.done', remote.removed, staging.removed, config.ttlHours)
     );
   }
 }
