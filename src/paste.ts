@@ -57,7 +57,17 @@ export async function paste(deps: PasteDependencies): Promise<void> {
     return passThroughPaste(log);
   }
 
-  const content = await deps.reader.read();
+  let content: ClipboardContent;
+  try {
+    content = await deps.reader.read();
+  } catch (err) {
+    // The readers turn every failure into an error payload rather than throwing,
+    // so this path should be unreachable. It exists because the alternative to
+    // handling it is a paste key that does nothing at all.
+    log.error(`clipboard reader threw: ${describeError(err)}`);
+    return passThroughPaste(log);
+  }
+
   const payload = describePayload(content);
   if (payload === undefined) {
     log.debug(`nothing to transfer (${summarize(content)}), passing the paste through`);

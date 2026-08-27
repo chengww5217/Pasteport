@@ -69,22 +69,39 @@ test('a trailing slash is canonicalised away', () => {
 
 test("detection reads the remote server's own environment first", async () => {
   const remote = probe({ [ENVIRON_PATH]: environ('TMPDIR=/scratch/tmp') }, ['/scratch/tmp']);
-  assert.equal(await detectRemoteTempRoot(remote, silentLogger), '/scratch/tmp');
+  assert.deepEqual(await detectRemoteTempRoot(remote, silentLogger), {
+    root: '/scratch/tmp',
+    detected: true,
+  });
   assert.deepEqual(remote.reads, [ENVIRON_PATH]);
 });
 
 test('a TMPDIR that is not there falls through to the standard locations', async () => {
   const remote = probe({ [ENVIRON_PATH]: environ('TMPDIR=/scratch/tmp') }, ['/tmp']);
-  assert.equal(await detectRemoteTempRoot(remote, silentLogger), '/tmp');
+  assert.deepEqual(await detectRemoteTempRoot(remote, silentLogger), {
+    root: '/tmp',
+    detected: true,
+  });
 });
 
 test('a remote without procfs is probed instead', async () => {
-  assert.equal(await detectRemoteTempRoot(probe({}, ['/tmp']), silentLogger), '/tmp');
-  assert.equal(await detectRemoteTempRoot(probe({}, ['/var/tmp']), silentLogger), '/var/tmp');
+  assert.deepEqual(await detectRemoteTempRoot(probe({}, ['/tmp']), silentLogger), {
+    root: '/tmp',
+    detected: true,
+  });
+  assert.deepEqual(await detectRemoteTempRoot(probe({}, ['/var/tmp']), silentLogger), {
+    root: '/var/tmp',
+    detected: true,
+  });
 });
 
-test('a host that answers nothing still gets a working default', async () => {
-  assert.equal(await detectRemoteTempRoot(probe({}, []), silentLogger), FALLBACK_REMOTE_TMP);
+test('a host that answers nothing gets a working default, marked as not detected', async () => {
+  // The caller must be able to tell this apart: it is also what a connection
+  // that is not serving yet looks like, and that answer must not be cached.
+  assert.deepEqual(await detectRemoteTempRoot(probe({}, []), silentLogger), {
+    root: FALLBACK_REMOTE_TMP,
+    detected: false,
+  });
 });
 
 test('the extension only ever writes under its own subdirectory', () => {

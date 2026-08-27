@@ -10,6 +10,7 @@ import { RemoteDirResolver } from './remote/remoteDir';
 import { isWritableRemote, remoteTemplateUri } from './remote/target';
 import { TransferService, type RateStore } from './remote/transfer';
 import { ensurePasteKeyReachesExtension, type PromptSuppression } from './skipShell';
+import { passThroughPaste } from './terminal';
 
 /** Where the measured throughput survives a window reload. */
 const RATE_KEY = 'pasteport.rateBytesPerSecond';
@@ -41,11 +42,13 @@ export function activate(context: vscode.ExtensionContext): void {
 
   context.subscriptions.push(
     vscode.commands.registerCommand('pasteport.paste', async () => {
-      // A second Cmd+V while the first transfer is still running would inject
-      // two paths in an unpredictable order; the press is dropped, with a log
-      // line rather than a dialog.
+      // A second paste while the first transfer is still running would inject
+      // two paths in an unpredictable order. The extension's own handling is
+      // dropped, but the keystroke is not: the key must still paste, exactly as
+      // it would if this extension were not installed.
       if (pasteInFlight) {
-        log.debug('paste already in progress, ignoring this one');
+        log.debug('paste already in progress, passing this one through');
+        await passThroughPaste(log);
         return;
       }
       pasteInFlight = true;
@@ -58,6 +61,11 @@ export function activate(context: vscode.ExtensionContext): void {
           log,
         });
       } catch (err) {
+        // paste() passes the keystroke through on every failure it can see, so
+        // reaching here means something threw after that decision was made —
+        // possibly after files were already transferred. Pasting on top of that
+        // would insert something the user never asked for, so this is a log
+        // only.
         log.error(`unexpected paste failure: ${describeError(err)}`);
       } finally {
         pasteInFlight = false;

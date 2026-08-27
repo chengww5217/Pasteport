@@ -49,6 +49,18 @@ export interface RemoteProbe {
   isDirectory(posixPath: string): Promise<boolean>;
 }
 
+export interface TempRootDetection {
+  root: string;
+  /**
+   * False when nothing answered and the fallback was taken.
+   *
+   * The caller needs to tell the two apart: at startup the remote file system
+   * may not be serving yet, and a fallback remembered from that moment would
+   * become the answer for the rest of the session.
+   */
+  detected: boolean;
+}
+
 /**
  * Extracts a usable temp directory from a NUL-separated `environ` blob.
  *
@@ -88,22 +100,25 @@ export function parseTempDirFromEnviron(bytes: Uint8Array): string | undefined {
  * Never throws — a failed detection has to degrade into a working default, since
  * the caller is in the middle of a paste.
  */
-export async function detectRemoteTempRoot(probe: RemoteProbe, log: Logger): Promise<string> {
+export async function detectRemoteTempRoot(
+  probe: RemoteProbe,
+  log: Logger
+): Promise<TempRootDetection> {
   const fromEnviron = await tempRootFromEnviron(probe, log);
-  if (fromEnviron !== undefined) return fromEnviron;
+  if (fromEnviron !== undefined) return { root: fromEnviron, detected: true };
 
   for (const candidate of TMP_CANDIDATES) {
     if (await probe.isDirectory(candidate)) {
       log.info(`remote temp directory: ${candidate} (found by probing)`);
-      return candidate;
+      return { root: candidate, detected: true };
     }
   }
 
   log.warn(
     `no remote temp directory could be detected (tried ${ENVIRON_PATH} and ` +
-      `${TMP_CANDIDATES.join(', ')}); using ${FALLBACK_REMOTE_TMP}`
+      `${TMP_CANDIDATES.join(', ')}); using ${FALLBACK_REMOTE_TMP} for now`
   );
-  return FALLBACK_REMOTE_TMP;
+  return { root: FALLBACK_REMOTE_TMP, detected: false };
 }
 
 async function tempRootFromEnviron(probe: RemoteProbe, log: Logger): Promise<string | undefined> {
@@ -121,8 +136,13 @@ async function tempRootFromEnviron(probe: RemoteProbe, log: Logger): Promise<str
     log.debug(`${ENVIRON_PATH} names no usable ${TMP_VARS.join('/')}; probing instead`);
     return undefined;
   }
+  // Deliberately not distinguishing "not a directory" from "could not stat it":
+  // either way this value cannot be used, and the probe below is the answer.
   if (!(await probe.isDirectory(candidate))) {
-    log.warn(`the remote TMPDIR (${candidate}) is not a readable directory; probing instead`);
+    log.warn(
+      `the temp directory named by the remote environment (${candidate}) could not be ` +
+        'confirmed as a directory; probing instead'
+    );
     return undefined;
   }
 

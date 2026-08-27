@@ -17,6 +17,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   detection. Detection costs at most two round trips, once per remote host per session.
 - `Pasteport: Diagnose` reports the resolved remote directory alongside the configured one.
 
+### Fixed
+
+- The paste key no longer does nothing while a transfer is in flight: the extension's own handling
+  is dropped, but the keystroke is passed through to the terminal as it always was.
+- A clipboard reader that throws — rather than returning an error payload, as all of them do —
+  passes the keystroke through instead of swallowing it.
+- Remote directory detection is bounded by a timeout and its result is only remembered when the host
+  actually answered. A detection that ran before the remote file system was serving no longer pins
+  `/tmp` for the rest of the session, and a half-dead connection can no longer leave the paste
+  command waiting forever.
+
 ## [0.0.1] - 2026-08-24
 
 Released on the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=chengww.pasteport)
