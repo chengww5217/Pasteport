@@ -1,0 +1,17 @@
+{
+  "extension.description": "Appuyez sur la touche de collage dans le terminal d'une fenêtre distante VS Code : l'image ou les fichiers de votre presse-papiers local sont envoyés sur l'hôte distant, et le chemin distant apparaît dans l'invite, prêt à être lu par un agent en ligne de commande.",
+  "capabilities.untrustedWorkspaces.description": "Pasteport lit seulement le presse-papiers et écrit dans le répertoire distant configuré ; la portée de ce paramètre est la machine, un espace de travail non approuvé ne peut donc pas le rediriger.",
+  "command.paste.title": "Coller dans le terminal distant",
+  "command.cancelTransfer.title": "Annuler le transfert",
+  "command.cleanUpRemoteFiles.title": "Nettoyer les fichiers distants",
+  "command.diagnose.title": "Diagnostiquer",
+  "config.remoteDir.description": "Répertoire POSIX absolu sur l'hôte distant où atterrissent les fichiers collés. Laissez vide pour utiliser le répertoire temporaire de l'hôte lui-même (son `TMPDIR`, sinon `/tmp`) avec un sous-répertoire `pasteport`. `~` n'est pas développé.",
+  "config.quoting.description": "Comment les chemins distants sont mis entre guillemets lors de l'insertion dans le terminal.",
+  "config.quoting.auto": "Équivalent à none pour l'instant ; s'adaptera une fois le comportement des TUI vérifié.",
+  "config.quoting.shell": "Mettre entre apostrophes les chemins contenant des caractères spéciaux, pour un shell.",
+  "config.quoting.none": "Insérer les chemins tels quels, pour les agents TUI qui n'analysent pas la syntaxe du shell.",
+  "config.trailingSpace.description": "Ajouter une espace après le chemin inséré pour pouvoir continuer à taper.",
+  "config.confirmAboveSeconds.description": "Demander confirmation avant les transferts estimés plus longs que ce nombre de secondes, d'après le débit mesuré. `0` pour ne jamais demander.",
+  "config.ttlHours.description": "Âge à partir duquel les fichiers collés sont supprimés de l'hôte distant et du répertoire temporaire local. `0` désactive le nettoyage.",
+  "config.bracketedPaste.description": "Entourer le chemin inséré des marqueurs de collage entre crochets (`ESC[200~` … `ESC[201~`). Désactivé par défaut ; la compatibilité entre TUI n'est pas vérifiée."
+}

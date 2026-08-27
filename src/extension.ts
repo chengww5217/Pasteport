@@ -74,7 +74,9 @@ export function activate(context: vscode.ExtensionContext): void {
 
     vscode.commands.registerCommand('pasteport.cancelTransfer', () => {
       if (!transfer.cancelActive()) {
-        void vscode.window.showInformationMessage('Pasteport: no transfer in progress.');
+        void vscode.window.showInformationMessage(
+          vscode.l10n.t('Pasteport: no transfer in progress.')
+        );
       }
     }),
 
@@ -171,8 +173,10 @@ async function cleanUp(
   if (template === undefined) {
     if (interactive) {
       void vscode.window.showInformationMessage(
-        `Pasteport: removed ${staging.removed} staged file(s) locally. ` +
-          'No remote target could be resolved in this window, so nothing was swept remotely.'
+        vscode.l10n.t(
+          'Pasteport: removed {0} staged file(s) locally. No remote target could be resolved in this window, so nothing was swept remotely.',
+          staging.removed
+        )
       );
     }
     return;
@@ -187,8 +191,12 @@ async function cleanUp(
 
   if (interactive) {
     void vscode.window.showInformationMessage(
-      `Pasteport: removed ${remote.removed} remote and ${staging.removed} local item(s) ` +
-        `older than ${config.ttlHours}h.`
+      vscode.l10n.t(
+        'Pasteport: removed {0} remote and {1} local item(s) older than {2}h.',
+        remote.removed,
+        staging.removed,
+        config.ttlHours
+      )
     );
   }
 }

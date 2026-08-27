@@ -351,9 +351,13 @@ function startTicker(
     const elapsed = (Date.now() - started) / 1000;
     const remaining = Math.max(0, estimate - elapsed);
     progress.report({
-      message:
-        `${source.remoteName} (${formatBytes(source.size)}) — ` +
-        `${formatSeconds(elapsed)} elapsed, ~${formatSeconds(remaining)} left`,
+      message: vscode.l10n.t(
+        '{0} ({1}) — {2} elapsed, ~{3} left',
+        source.remoteName,
+        formatBytes(source.size),
+        formatSeconds(elapsed),
+        formatSeconds(remaining)
+      ),
     });
   };
 
@@ -363,23 +367,36 @@ function startTicker(
 }
 
 async function confirmSlowTransfer(bytes: number, seconds: number): Promise<boolean> {
+  const send = vscode.l10n.t('Send');
   const choice = await vscode.window.showWarningMessage(
-    `Send ${formatBytes(bytes)} to the remote host?`,
-    { modal: true, detail: `Estimated ${formatSeconds(seconds)} at the last measured speed.` },
-    'Send'
+    vscode.l10n.t('Send {0} to the remote host?', formatBytes(bytes)),
+    {
+      modal: true,
+      detail: vscode.l10n.t('Estimated {0} at the last measured speed.', formatSeconds(seconds)),
+    },
+    send
   );
-  return choice === 'Send';
+  return choice === send;
 }
 
+/**
+ * The message a failed transfer is reported with.
+ *
+ * Translated, because it is shown in a dialog; the log line that accompanies it
+ * carries the same text, which is the accepted cost of not maintaining two
+ * wordings for one failure.
+ */
 function describeFsError(err: unknown): string {
   if (err instanceof vscode.FileSystemError) {
     switch (err.code) {
       case 'NoPermissions':
-        return 'the remote directory is not writable — check pasteport.remoteDir';
+        return vscode.l10n.t('the remote directory is not writable — check pasteport.remoteDir');
       case 'Unavailable':
-        return 'the remote connection is unavailable — reconnect the window and try again';
+        return vscode.l10n.t(
+          'the remote connection is unavailable — reconnect the window and try again'
+        );
       default:
-        return `remote write failed (${err.code}): ${err.message}`;
+        return vscode.l10n.t('remote write failed ({0}): {1}', err.code, err.message);
     }
   }
   return describeError(err);

@@ -7,6 +7,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- The interface is localised into Simplified Chinese, Traditional Chinese, Japanese, Korean, French,
+  German, Spanish, Russian and Brazilian Portuguese, and follows the display language of VS Code
+  itself. Command titles and setting descriptions come from `package.nls.*.json`, dialogs and
+  notifications from `l10n/bundle.l10n.*.json`. Log output stays English on purpose: it is what a bug
+  report carries.
+
 ### Changed
 
 - Clipboard images are staged in the extension's own global storage instead of a fixed name under

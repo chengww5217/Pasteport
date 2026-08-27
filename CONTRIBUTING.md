@@ -123,6 +123,28 @@ An extension keybinding outranks the built-in terminal paste, so any binding add
 the pass-through path working: if the clipboard holds no image or file, `pasteport.paste` has to
 behave exactly like the paste it displaced.
 
+## Localisation
+
+The UI is translated in two halves, because VS Code loads them differently:
+
+- `package.nls.json` and `package.nls.<locale>.json` cover everything in `package.json` — command
+  titles, setting descriptions. The manifest refers to them as `%key%`.
+- `l10n/bundle.l10n.json` and `l10n/bundle.l10n.<locale>.json` cover everything in the code. The key
+  **is** the English sentence, so `vscode.l10n.t('Send')` and the bundle entry must match character
+  for character.
+
+Log lines are deliberately not translated: they are what a bug report carries, and an English log is
+readable by everyone who might act on it. Only what a user is shown goes through `l10n.t`.
+
+The readers under `src/clipboard/` are pure modules that never import `vscode`, so they cannot call
+`l10n.t` at all. They report a `code` on the error instead, and `src/paste.ts` turns that into a
+translated sentence.
+
+Adding a language means one file in each half, and both must be added together —
+`src/test/l10n.test.ts` fails if the two sets of locales disagree, if a key is missing, empty or
+stale, or if a translation drops a `{0}` placeholder. Locale names follow VS Code's own display
+languages, lowercased: `zh-cn`, `pt-br`, and so on.
+
 ## Releasing
 
 A tag is the whole release process:

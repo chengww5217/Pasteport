@@ -1,0 +1,17 @@
+{
+  "extension.description": "在 VS Code 遠端視窗的終端機中按下貼上鍵，本機剪貼簿裡的圖片或檔案會傳送到遠端主機，並把遠端路徑填入提示字元，供命令列 AI 助手直接讀取。",
+  "capabilities.untrustedWorkspaces.description": "Pasteport 只讀取剪貼簿並寫入所設定的遠端目錄；該設定的範圍是「機器」，因此不受信任的工作區無法變更它。",
+  "command.paste.title": "貼上到遠端終端機",
+  "command.cancelTransfer.title": "取消傳輸",
+  "command.cleanUpRemoteFiles.title": "清理遠端檔案",
+  "command.diagnose.title": "診斷",
+  "config.remoteDir.description": "遠端主機上存放貼上檔案的絕對 POSIX 目錄。留空則使用遠端主機自己的暫存目錄（其 `TMPDIR`，否則回退到 `/tmp`）下的 `pasteport` 子目錄。`~` 不會展開。",
+  "config.quoting.description": "插入終端機的遠端路徑如何加引號。",
+  "config.quoting.auto": "目前等同於 none；待確認 TUI 的引號行為後會自動調整。",
+  "config.quoting.shell": "為含有特殊字元的路徑加上單引號，適用於 shell。",
+  "config.quoting.none": "原樣插入路徑，適用於不解析 shell 語法的 TUI 助手。",
+  "config.trailingSpace.description": "在插入的路徑後加上一個空格，方便繼續輸入。",
+  "config.confirmAboveSeconds.description": "依實測傳輸速率估算，若耗時超過此秒數則先詢問。設為 `0` 表示永不詢問。",
+  "config.ttlHours.description": "貼上的檔案在遠端主機與本機暫存目錄中保留的小時數，超過即清理。設為 `0` 表示停用清理。",
+  "config.bracketedPaste.description": "以括號貼上標記（`ESC[200~` … `ESC[201~`）包住插入的路徑。預設關閉；各 TUI 的相容性尚未驗證。"
+}

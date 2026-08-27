@@ -60,17 +60,19 @@ export async function offerPackageInstall(
   });
   const rendered = renderCommand(command, args);
 
-  const install = 'Install';
-  const show = 'Show Command';
+  const install = vscode.l10n.t('Install');
+  const show = vscode.l10n.t('Show Command');
   const choice = await vscode.window.showWarningMessage(
-    `Pasteport: ${reason}`,
+    vscode.l10n.t('Pasteport: {0}', reason),
     {
       modal: true,
       // The exact command, verbatim: this runs as root on the user's machine and
       // they are entitled to read it before agreeing, not after.
-      detail:
-        `Install it with ${manager.id}? Pasteport will run:\n\n${rendered}\n\n` +
-        'Your desktop will ask for authentication.',
+      detail: vscode.l10n.t(
+        'Install it with {0}? Pasteport will run:\n\n{1}\n\nYour desktop will ask for authentication.',
+        manager.id,
+        rendered
+      ),
     },
     install,
     show
@@ -107,7 +109,7 @@ async function runInstall(
   const failure = await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
-      title: `Pasteport: installing ${packages.join(' ')}`,
+      title: vscode.l10n.t('Pasteport: installing {0}', packages.join(' ')),
       cancellable: false,
     },
     async (): Promise<string | undefined> => {
@@ -133,19 +135,21 @@ async function runInstall(
   if (failure === undefined) {
     log.info(`installed ${packages.join(' ')}`);
     void vscode.window.showInformationMessage(
-      `Pasteport: installed ${packages.join(' ')}. Press paste again.`
+      vscode.l10n.t('Pasteport: installed {0}. Press paste again.', packages.join(' '))
     );
     return;
   }
 
   log.error(`install failed: ${failure}`);
+  const showCommand = vscode.l10n.t('Show Command');
+  const showLog = vscode.l10n.t('Show Log');
   const choice = await vscode.window.showErrorMessage(
-    `Pasteport: could not install ${packages.join(' ')}.`,
-    'Show Command',
-    'Show Log'
+    vscode.l10n.t('Pasteport: could not install {0}.', packages.join(' ')),
+    showCommand,
+    showLog
   );
-  if (choice === 'Show Log') log.show(true);
-  if (choice === 'Show Command') await showManualInstructions(packages, manager, log);
+  if (choice === showLog) log.show(true);
+  if (choice === showCommand) await showManualInstructions(packages, manager, log);
 }
 
 /**
@@ -169,7 +173,7 @@ async function showManualInstructions(
   log.show(true);
 
   await vscode.window.showInformationMessage(
-    `Pasteport: run this in a local terminal — ${rendered}`
+    vscode.l10n.t('Pasteport: run this in a local terminal — {0}', rendered)
   );
 }
 

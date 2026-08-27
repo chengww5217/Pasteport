@@ -1,0 +1,17 @@
+{
+  "extension.description": "Pulsa la tecla de pegar en el terminal de una ventana remota de VS Code: la imagen o los archivos de tu portapapeles local se envían al host remoto y la ruta remota aparece en el prompt, lista para que la lea un agente de línea de comandos.",
+  "capabilities.untrustedWorkspaces.description": "Pasteport solo lee el portapapeles y escribe en el directorio remoto configurado; el ámbito de esa opción es la máquina, así que un espacio de trabajo no confiable no puede redirigirla.",
+  "command.paste.title": "Pegar en el terminal remoto",
+  "command.cancelTransfer.title": "Cancelar la transferencia",
+  "command.cleanUpRemoteFiles.title": "Limpiar los archivos remotos",
+  "command.diagnose.title": "Diagnosticar",
+  "config.remoteDir.description": "Directorio POSIX absoluto del host remoto donde acaban los archivos pegados. Déjalo vacío para usar el directorio temporal del propio host (su `TMPDIR`, o `/tmp`) con un subdirectorio `pasteport`. `~` no se expande.",
+  "config.quoting.description": "Cómo se entrecomillan las rutas remotas al insertarlas en el terminal.",
+  "config.quoting.auto": "Ahora mismo equivale a none; se adaptará cuando se verifique el comportamiento de los TUI.",
+  "config.quoting.shell": "Entrecomillar con comillas simples las rutas con caracteres especiales, para usarlas en un shell.",
+  "config.quoting.none": "Insertar las rutas tal cual, para agentes TUI que no interpretan la sintaxis del shell.",
+  "config.trailingSpace.description": "Añadir un espacio tras la ruta insertada para poder seguir escribiendo.",
+  "config.confirmAboveSeconds.description": "Preguntar antes de las transferencias que, según la velocidad medida, superen estos segundos. `0` para no preguntar nunca.",
+  "config.ttlHours.description": "Antigüedad a la que los archivos pegados se eliminan del host remoto y del directorio temporal local. `0` desactiva la limpieza.",
+  "config.bracketedPaste.description": "Envolver la ruta insertada en marcadores de pegado entre corchetes (`ESC[200~` … `ESC[201~`). Desactivado por defecto; la compatibilidad entre TUI no está verificada."
+}

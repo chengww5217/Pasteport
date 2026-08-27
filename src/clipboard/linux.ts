@@ -178,6 +178,7 @@ export async function readLinuxClipboard(options: LinuxReaderOptions): Promise<C
   if (backends.length === 0) {
     return {
       kind: 'error',
+      code: 'noGraphicalSession',
       actionable: true,
       message:
         'no graphical session found (neither WAYLAND_DISPLAY nor DISPLAY is set), ' +
@@ -226,12 +227,14 @@ export async function readLinuxClipboard(options: LinuxReaderOptions): Promise<C
   // unreachable until something is installed. The reader states which package
   // would fix it; whether to offer that is the UI layer's call.
   if (missingBackends.length > 0 && missingBackends.length === backends.length) {
-    const tools = missingBackends.map(toolFor).join(' or ');
+    const tools = missingBackends.map(toolFor);
     const packages = [...new Set(missingBackends.map(packageFor))];
     return {
       kind: 'error',
+      code: 'clipboardToolMissing',
+      tools,
       actionable: true,
-      message: `${tools} is not installed, so the clipboard cannot be read`,
+      message: `${tools.join(' or ')} is not installed, so the clipboard cannot be read`,
       remedy: { kind: 'installPackages', packages },
     };
   }

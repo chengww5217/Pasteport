@@ -43,9 +43,24 @@ export interface InstallPackagesRemedy {
   packages: string[];
 }
 
+/**
+ * Identifies the errors worth showing to the user, so the UI layer can put a
+ * translated sentence in front of them.
+ *
+ * The readers cannot do that themselves: they are pure modules, unit tested
+ * outside the extension host, and `vscode.l10n` only exists inside it. `message`
+ * therefore stays English — it is what ends up in the log and in bug reports —
+ * while `code` is what the notification is built from.
+ */
+export type ClipboardErrorCode = 'noGraphicalSession' | 'clipboardToolMissing';
+
 export interface ClipboardError {
   kind: 'error';
+  /** English, for the log; never shown as-is when `code` is set. */
   message: string;
+  code?: ClipboardErrorCode;
+  /** Tool names named by a `clipboardToolMissing` message. */
+  tools?: string[];
   /**
    * Set when the user can fix this themselves — a missing Linux clipboard tool,
    * for instance. Those are worth surfacing once instead of only logging, since

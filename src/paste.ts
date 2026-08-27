@@ -79,7 +79,10 @@ export async function paste(deps: PasteDependencies): Promise<void> {
 
   if (!isWritableRemote(template)) {
     log.error(`remote file system "${template.scheme}" is not writable; cannot transfer`);
-    showFailure(`Pasteport: the remote file system (${template.scheme}) is not writable.`, log);
+    showFailure(
+      vscode.l10n.t('Pasteport: the remote file system ({0}) is not writable.', template.scheme),
+      log
+    );
     return;
   }
 
@@ -89,7 +92,7 @@ export async function paste(deps: PasteDependencies): Promise<void> {
   // with nothing.
   if (vscode.window.terminals.length === 0) {
     log.warn('no terminal is open, nothing to insert into');
-    void vscode.window.showInformationMessage('Pasteport: open a terminal first.');
+    void vscode.window.showInformationMessage(vscode.l10n.t('Pasteport: open a terminal first.'));
     return;
   }
 
@@ -101,7 +104,7 @@ export async function paste(deps: PasteDependencies): Promise<void> {
     sources = await describeSources(payload.paths, payload.kind);
   } catch (err) {
     log.error(`could not read the clipboard files: ${describeError(err)}`);
-    showFailure('Pasteport: could not read the files from the clipboard.', log);
+    showFailure(vscode.l10n.t('Pasteport: could not read the files from the clipboard.'), log);
     return;
   }
 
@@ -124,7 +127,7 @@ export async function paste(deps: PasteDependencies): Promise<void> {
 
     case 'failed':
       log.error(`transfer failed: ${outcome.message}`);
-      showFailure(`Pasteport: ${outcome.message}`, log);
+      showFailure(vscode.l10n.t('Pasteport: {0}', outcome.message), log);
       return;
 
     case 'done': {
@@ -143,7 +146,10 @@ export async function paste(deps: PasteDependencies): Promise<void> {
         log,
       });
       if (!injected) {
-        showFailure('Pasteport: files were transferred but the path could not be inserted.', log);
+        showFailure(
+          vscode.l10n.t('Pasteport: files were transferred but the path could not be inserted.'),
+          log
+        );
       }
       return;
     }
@@ -233,22 +239,49 @@ function notifyActionableOnce(error: ClipboardError, log: Logger): void {
   if (notifiedActionable.has(error.message)) return;
   notifiedActionable.add(error.message);
 
+  const reason = describeClipboardError(error);
+
   // A problem with a known fix gets the fix offered; everything else gets the
   // log, which is all we can honestly do about it.
   if (error.remedy?.kind === 'installPackages') {
-    void offerPackageInstall(error.remedy.packages, error.message, log);
+    void offerPackageInstall(error.remedy.packages, reason, log);
     return;
   }
 
+  const showLog = vscode.l10n.t('Show Log');
   void vscode.window
-    .showWarningMessage(`Pasteport: ${error.message}`, 'Show Log')
+    .showWarningMessage(vscode.l10n.t('Pasteport: {0}', reason), showLog)
     .then((choice) => {
-      if (choice === 'Show Log') log.show(true);
+      if (choice === showLog) log.show(true);
     });
 }
 
+/**
+ * The user-facing half of a reader error.
+ *
+ * The readers are pure modules with no access to `vscode.l10n`, so they report a
+ * code and leave the sentence to be built here; anything without a code has only
+ * its English message to offer, which is better than nothing.
+ */
+function describeClipboardError(error: ClipboardError): string {
+  switch (error.code) {
+    case 'noGraphicalSession':
+      return vscode.l10n.t(
+        'no graphical session was found, so the clipboard cannot be read (neither WAYLAND_DISPLAY nor DISPLAY is set)'
+      );
+    case 'clipboardToolMissing':
+      return vscode.l10n.t(
+        '{0} is not installed, so the clipboard cannot be read',
+        (error.tools ?? []).join(' or ')
+      );
+    default:
+      return error.message;
+  }
+}
+
 function showFailure(message: string, log: Logger): void {
-  void vscode.window.showErrorMessage(message, 'Show Log').then((choice) => {
-    if (choice === 'Show Log') log.show(true);
+  const showLog = vscode.l10n.t('Show Log');
+  void vscode.window.showErrorMessage(message, showLog).then((choice) => {
+    if (choice === showLog) log.show(true);
   });
 }

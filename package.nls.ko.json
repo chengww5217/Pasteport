@@ -1,0 +1,17 @@
+{
+  "extension.description": "VS Code 원격 창의 터미널에서 붙여넣기 키를 누르면 로컬 클립보드의 이미지나 파일이 원격 호스트로 전송되고, 원격 경로가 프롬프트에 입력되어 CLI 에이전트가 바로 읽을 수 있습니다.",
+  "capabilities.untrustedWorkspaces.description": "Pasteport는 클립보드를 읽고 설정된 원격 디렉터리에 쓰는 일만 합니다. 디렉터리 설정의 범위는 머신이므로 신뢰할 수 없는 작업 영역이 이를 바꿀 수 없습니다.",
+  "command.paste.title": "원격 터미널에 붙여넣기",
+  "command.cancelTransfer.title": "전송 취소",
+  "command.cleanUpRemoteFiles.title": "원격 파일 정리",
+  "command.diagnose.title": "진단",
+  "config.remoteDir.description": "붙여넣은 파일이 저장될 원격 호스트의 절대 POSIX 디렉터리입니다. 비워 두면 원격 호스트 자체의 임시 디렉터리(`TMPDIR`, 없으면 `/tmp`) 아래의 `pasteport` 하위 디렉터리를 사용합니다. `~`는 확장되지 않습니다.",
+  "config.quoting.description": "터미널에 삽입되는 원격 경로의 인용 방식입니다.",
+  "config.quoting.auto": "현재는 none과 같습니다. TUI의 인용부호 처리가 확인되면 조정됩니다.",
+  "config.quoting.shell": "특수 문자가 있는 경로를 작은따옴표로 감쌉니다. 셸에서 사용할 때 적합합니다.",
+  "config.quoting.none": "경로를 그대로 삽입합니다. 셸 구문을 해석하지 않는 TUI 에이전트에 적합합니다.",
+  "config.trailingSpace.description": "삽입한 경로 뒤에 공백을 추가해 계속 입력할 수 있게 합니다.",
+  "config.confirmAboveSeconds.description": "측정된 전송 속도로 계산한 예상 시간이 이 초 수를 넘으면 먼저 확인합니다. `0`이면 묻지 않습니다.",
+  "config.ttlHours.description": "붙여넣은 파일을 원격 호스트와 로컬 임시 디렉터리에서 삭제하기까지의 시간입니다. `0`이면 정리를 비활성화합니다.",
+  "config.bracketedPaste.description": "삽입한 경로를 대괄호 붙여넣기 표식(`ESC[200~` … `ESC[201~`)으로 감쌉니다. 기본값은 꺼짐이며 TUI별 호환성은 확인되지 않았습니다."
+}
