@@ -23,9 +23,13 @@ local clipboard are sent to the remote host — then the **remote path** is type
 ready for a CLI agent to read.
 
 ```
-$ claude "what is wrong in this screenshot?" /tmp/pasteport/9f2c1a4b7e0d3856/clipboard.png
-                                             └── appeared when you pressed paste
+$ /tmp/pasteport/9f2c1a4b7e0d3856/clipboard.png
+  └── appeared when you pressed paste
 ```
+
+<p align="center">
+  <img src="assets/demo.gif" alt="Demo: take a screenshot, press paste in a remote terminal, and its remote path is inserted" width="800" />
+</p>
 
 Nothing changes in a local window: the keystroke is passed straight through to the terminal, so
 you can leave the keybinding in place everywhere.

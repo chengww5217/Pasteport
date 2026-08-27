@@ -101,6 +101,10 @@ it is unaffected by this layout.
 The icon SVG contains no `<text>`, and the renderer runs with system fonts disabled, so the PNG is
 identical on every machine.
 
+`assets/demo.gif` is the one binary asset checked in — vsce rejects an SVG in the README but has no
+quarrel with a GIF. `assets/demo_gif.py` regenerates it (Python + Pillow; run it by hand, it is not
+part of the build), and `.gitattributes` marks it binary so LF normalisation cannot corrupt it.
+
 ## Architecture in one paragraph
 
 The extension is `extensionKind: ["ui"]`, so it runs locally and can read the native pasteboard.

@@ -20,9 +20,13 @@
 **远程路径**被写入你的提示符，命令行 AI 助手可以直接读取。
 
 ```
-$ claude "这张截图里有什么问题？" /tmp/pasteport/9f2c1a4b7e0d3856/clipboard.png
-                                 └── 按下粘贴键时出现的
+$ /tmp/pasteport/9f2c1a4b7e0d3856/clipboard.png
+  └── 按下粘贴键时出现的
 ```
+
+<p align="center">
+  <img src="../assets/demo.gif" alt="演示：截图后在远程终端里按下粘贴键，图片被上传，远程路径插入提示符" width="800" />
+</p>
 
 本地窗口里什么都不会变：按键会被原样交还给终端，所以这个快捷键可以放心地一直绑着。
 

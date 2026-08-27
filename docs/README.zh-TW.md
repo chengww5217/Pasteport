@@ -20,9 +20,13 @@
 接著**遠端路徑**會被寫進你的提示字元，命令列 AI 助手可以直接讀取。
 
 ```
-$ claude "這張截圖有什麼問題？" /tmp/pasteport/9f2c1a4b7e0d3856/clipboard.png
-                               └── 按下貼上鍵時出現的
+$ /tmp/pasteport/9f2c1a4b7e0d3856/clipboard.png
+  └── 按下貼上鍵時出現的
 ```
+
+<p align="center">
+  <img src="../assets/demo.gif" alt="演示：截圖後在遠端終端機裡按下貼上鍵，圖片被上傳，遠端路徑插入提示字元" width="800" />
+</p>
 
 在本機視窗裡什麼都不會變：按鍵會原封不動交還給終端機，所以這個快速鍵可以一直綁著。
 

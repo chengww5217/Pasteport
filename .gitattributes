@@ -3,3 +3,6 @@
 # report every file as unformatted. Normalise to LF everywhere instead; nothing here
 # needs CRLF, including the PowerShell reader.
 * text=auto eol=lf
+
+# The demo animation is a binary asset; LF normalisation must never touch it.
+*.gif binary
