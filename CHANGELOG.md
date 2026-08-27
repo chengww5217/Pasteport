@@ -9,6 +9,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- Clipboard images are staged in the extension's own global storage instead of a fixed name under
+  `os.tmpdir()`. On Linux that was a shared, world-writable `/tmp`, where another user of the machine
+  could read every screenshot passing through, or pre-create the directory and plant a symlink under
+  a name that is only a millisecond timestamp. `Pasteport: Diagnose` prints the path in use.
 - `pasteport.remoteDir` now defaults to empty, which means "detect it". The remote host's own
   `TMPDIR` is read out of the remote server process's environment through `workspace.fs`
   (`/proc/self/environ`), falling back to the first of `/tmp` and `/var/tmp` that exists, and then

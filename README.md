@@ -117,6 +117,10 @@ guessing at a byte count. `Pasteport: Cancel Transfer` is available as a command
 Uploaded files and locally staged images older than `pasteport.ttlHours` (24 by default) are
 removed in the background at startup, and on demand via `Pasteport: Clean Up Remote Files`.
 
+Images extracted from the clipboard are staged inside the extension's own global storage, which
+lives in your VS Code profile — not in `/tmp`, where on a shared Linux machine another user could
+read them or plant a symlink under a predictable name. `Pasteport: Diagnose` prints the exact path.
+
 The sweep only ever deletes directories whose names match the extension's own fingerprint format
 (16 hex characters) and staged images matching its own naming scheme. Anything else under
 `remoteDir` is counted and left alone, so pointing the setting at a shared directory cannot turn

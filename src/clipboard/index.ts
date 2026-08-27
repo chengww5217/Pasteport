@@ -1,5 +1,4 @@
 import * as fs from 'node:fs/promises';
-import * as os from 'node:os';
 import * as path from 'node:path';
 
 import { describeError, type Logger } from '../log';
@@ -9,9 +8,6 @@ import type { ClipboardContent } from './types';
 import { readWin32Clipboard } from './win32';
 
 export type { ClipboardContent } from './types';
-
-/** Where platform readers stage images they extract from the clipboard. */
-export const STAGING_DIR = path.join(os.tmpdir(), 'pasteport-staging');
 
 /**
  * The name shape every platform reader must produce for a staged image:
@@ -29,6 +25,15 @@ export interface ClipboardReader {
 export interface ReaderContext {
   /** Root of the installed extension; resources/ lives directly under it. */
   extensionPath: string;
+  /**
+   * Where readers write images they extract from the clipboard.
+   *
+   * Supplied by the caller rather than derived from `os.tmpdir()`: on Linux that
+   * is a shared, world-writable `/tmp`, where a fixed name can be pre-created or
+   * pre-symlinked by another user and every staged screenshot would be readable
+   * by all of them.
+   */
+  stagingDir: string;
   log: Logger;
 }
 
@@ -55,28 +60,29 @@ export function createClipboardReader(context: ReaderContext): ClipboardReader |
  */
 function platformRead(context: ReaderContext): (() => Promise<ClipboardContent>) | undefined {
   const resource = (name: string): string => path.join(context.extensionPath, 'resources', name);
+  const { stagingDir, log } = context;
 
   switch (process.platform) {
     case 'darwin':
       return () =>
         readDarwinClipboard({
           scriptPath: resource('clipboard-read.darwin.js'),
-          stagingDir: STAGING_DIR,
-          log: context.log,
+          stagingDir,
+          log,
         });
 
     case 'win32':
       return () =>
         readWin32Clipboard({
           scriptPath: resource('clipboard-read.win32.ps1'),
-          stagingDir: STAGING_DIR,
-          log: context.log,
+          stagingDir,
+          log,
         });
 
     // No resource file: the display server tools are the reader, so there is no
     // script to hand an interpreter.
     case 'linux':
-      return () => readLinuxClipboard({ stagingDir: STAGING_DIR, log: context.log });
+      return () => readLinuxClipboard({ stagingDir, log });
 
     default:
       return undefined;
