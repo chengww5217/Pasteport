@@ -1,3 +1,4 @@
+import * as os from 'node:os';
 import * as path from 'node:path';
 
 import * as vscode from 'vscode';
@@ -28,13 +29,20 @@ export function activate(context: vscode.ExtensionContext): void {
   // itself has to be installed locally. If VS Code ever hands a ui-kind
   // extension a non-file location, spawning would silently target nothing —
   // better to degrade to a pass-through and say so.
-  const local = localPaths(context);
-  if (local === undefined) {
+  const staging = stagingDir();
+  const reader =
+    context.extensionUri.scheme === 'file'
+      ? createClipboardReader({
+          extensionPath: context.extensionUri.fsPath,
+          stagingDir: staging,
+          log,
+        })
+      : undefined;
+  if (reader === undefined && context.extensionUri.scheme !== 'file') {
     log.error(
       `extension is not installed locally (${context.extensionUri.scheme}); pastes will pass through`
     );
   }
-  const reader = local === undefined ? undefined : createClipboardReader({ ...local, log });
 
   const transfer = new TransferService(log, rateStore(context));
   const remoteDirs = new RemoteDirResolver(log);
@@ -81,11 +89,11 @@ export function activate(context: vscode.ExtensionContext): void {
     }),
 
     vscode.commands.registerCommand('pasteport.cleanUpRemoteFiles', () =>
-      cleanUp(log, remoteDirs, local?.stagingDir, true)
+      cleanUp(log, remoteDirs, staging, true)
     ),
 
     vscode.commands.registerCommand('pasteport.diagnose', () =>
-      diagnose(log, reader, transfer, remoteDirs, local?.stagingDir)
+      diagnose(log, reader, transfer, remoteDirs, staging)
     )
   );
 
@@ -94,7 +102,7 @@ export function activate(context: vscode.ExtensionContext): void {
   // Cleanup is best-effort background work: it must never delay a paste, and a
   // failure here is not worth a dialog. It also warms the remote directory
   // resolver, so the first paste of a session does not pay for detection.
-  void cleanUp(log, remoteDirs, local?.stagingDir, false);
+  void cleanUp(log, remoteDirs, staging, false);
 
   // On Windows and Linux the keybinding is only useful if the command is allowed
   // to skip the shell. Nothing to check when no reader exists: the command would
@@ -109,25 +117,19 @@ export function deactivate(): void {
 }
 
 /**
- * The two local paths the reader needs, or undefined when this extension is not
- * running from local disk.
+ * Where readers stage images they extract from the clipboard: a
+ * `pasteport-staging` directory under the OS temp directory, which the OS
+ * itself reaps on its own schedule and the TTL sweeper complements.
  *
- * Staged images go under the extension's own global storage rather than
- * `os.tmpdir()`. On Linux that is a shared 1777 `/tmp`: a fixed name there can be
- * pre-created or pre-symlinked by another user of the machine, and every
- * screenshot passing through would be world-readable. Global storage is inside
- * the user's profile, so it is private by construction.
+ * On Linux `os.tmpdir()` is the shared, world-writable `/tmp`, so the name
+ * carries the uid and the reader creates the directory with `0700` — another
+ * user of the machine can neither read what passes through nor claim the
+ * name first. macOS and Windows already hand every user a private temp
+ * directory, so there the plain name is enough.
  */
-function localPaths(
-  context: vscode.ExtensionContext
-): { extensionPath: string; stagingDir: string } | undefined {
-  if (context.extensionUri.scheme !== 'file' || context.globalStorageUri.scheme !== 'file') {
-    return undefined;
-  }
-  return {
-    extensionPath: context.extensionUri.fsPath,
-    stagingDir: path.join(context.globalStorageUri.fsPath, 'staging'),
-  };
+function stagingDir(): string {
+  const suffix = process.platform === 'linux' ? `-${process.getuid?.() ?? 0}` : '';
+  return path.join(os.tmpdir(), `pasteport-staging${suffix}`);
 }
 
 function rateStore(context: vscode.ExtensionContext): RateStore {
@@ -152,23 +154,18 @@ function skipShellPromptSuppression(context: vscode.ExtensionContext): PromptSup
 /**
  * TTL sweep of both ends.
  *
- * @param stagingDir undefined when there is no local staging directory to sweep,
- * which is the same condition that leaves the reader undefined.
  * @param interactive whether to report the result to the user.
  */
 async function cleanUp(
   log: Logger,
   remoteDirs: RemoteDirResolver,
-  stagingDir: string | undefined,
+  stagingDir: string,
   interactive: boolean
 ): Promise<void> {
   const config = readConfig(log);
   const template = remoteTemplateUri();
 
-  const staging =
-    stagingDir === undefined
-      ? { removed: 0, kept: 0, foreign: 0 }
-      : await sweepStaging({ stagingDir, ttlHours: config.ttlHours, log });
+  const staging = await sweepStaging({ stagingDir, ttlHours: config.ttlHours, log });
 
   if (template === undefined) {
     if (interactive) {
@@ -212,7 +209,7 @@ async function diagnose(
   reader: ClipboardReader | undefined,
   transfer: TransferService,
   remoteDirs: RemoteDirResolver,
-  stagingDir: string | undefined
+  stagingDir: string
 ): Promise<void> {
   log.show(true);
   log.info('--- Pasteport diagnostics ---');
@@ -224,7 +221,7 @@ async function diagnose(
   log.info(
     `clipboard reader        : ${reader === undefined ? 'none for this platform' : 'available'}`
   );
-  log.info(`staging dir             : ${stagingDir ?? '(none - not installed locally)'}`);
+  log.info(`staging dir             : ${stagingDir}`);
 
   const config = readConfig(log);
   log.info(

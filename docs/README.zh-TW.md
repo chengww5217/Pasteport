@@ -111,9 +111,9 @@ $ claude "這張截圖有什麼問題？" /tmp/pasteport/9f2c1a4b7e0d3856/clipbo
 上傳的檔案與本機暫存的圖片超過 `pasteport.ttlHours`（預設 24 小時）後，會在啟動時於背景被清除，也可以
 透過 `Pasteport: Clean Up Remote Files` 手動觸發。
 
-從剪貼簿取出的圖片暫存在擴充功能自己的 global storage 裡，也就是你的 VS Code 設定檔目錄中 —— 而不是
-`/tmp`：在多使用者的 Linux 機器上，別人可以讀到它們，或者用一個可預測的名稱事先放一個符號連結。
-`Pasteport: Diagnose` 會印出確切路徑。
+從剪貼簿取出的圖片，暫存在系統暫存目錄下的 `pasteport-staging` 資料夾裡。Linux 上那就是共用的
+`/tmp`，所以資料夾名帶上了您的 uid，並以 `0700` 權限建立，共用機器上的其他使用者進不去、也讀不到
+裡面的內容。`Pasteport: Diagnose` 會印出確切路徑。
 
 清理只會刪除名稱符合擴充功能自身指紋格式（16 個十六進位字元）的目錄，以及符合自身命名規則的暫存圖片。
 `remoteDir` 下的其他內容只會被計數並原樣留下，因此把這個設定指向共用目錄，也不會讓清理造成連帶損害。

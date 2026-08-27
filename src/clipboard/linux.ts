@@ -187,7 +187,10 @@ export async function readLinuxClipboard(options: LinuxReaderOptions): Promise<C
   }
 
   try {
-    await fs.mkdir(stagingDir, { recursive: true });
+    // 0700 because on Linux this directory lives in the shared /tmp — the
+    // permissions are what keeps other users out of it. Mode is ignored when
+    // the directory already exists, which is fine: it was ours to begin with.
+    await fs.mkdir(stagingDir, { recursive: true, mode: 0o700 });
   } catch (err) {
     return {
       kind: 'error',

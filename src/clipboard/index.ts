@@ -26,12 +26,10 @@ export interface ReaderContext {
   /** Root of the installed extension; resources/ lives directly under it. */
   extensionPath: string;
   /**
-   * Where readers write images they extract from the clipboard.
-   *
-   * Supplied by the caller rather than derived from `os.tmpdir()`: on Linux that
-   * is a shared, world-writable `/tmp`, where a fixed name can be pre-created or
-   * pre-symlinked by another user and every staged screenshot would be readable
-   * by all of them.
+   * Where readers write images they extract from the clipboard. Supplied by
+   * the caller — the OS temp directory, with a per-user name on Linux (see
+   * `stagingDir()` in extension.ts) — so tests can point it at a throwaway
+   * directory.
    */
   stagingDir: string;
   log: Logger;

@@ -111,9 +111,9 @@ $ claude "这张截图里有什么问题？" /tmp/pasteport/9f2c1a4b7e0d3856/cli
 上传的文件和本地暂存的图片超过 `pasteport.ttlHours`（默认 24 小时）后，会在启动时于后台被清除，也可以
 通过 `Pasteport: Clean Up Remote Files` 手动触发。
 
-从剪贴板取出的图片暂存在扩展自己的 global storage 里，也就是你的 VS Code 配置目录中 —— 而不是 `/tmp`：
-在多用户的 Linux 机器上，别人可以读到它们，或者用一个可预测的名字提前放一个符号链接。
-`Pasteport: Diagnose` 会打印确切路径。
+从剪贴板取出的图片，暂存在系统临时目录下的 `pasteport-staging` 文件夹里。Linux 上那就是共享的
+`/tmp`，所以文件夹名带上了你的 uid，并以 `0700` 权限创建，共享机器上的其他用户进不去、也读不到
+里面的内容。`Pasteport: Diagnose` 会打印确切路径。
 
 清理只会删除名字符合扩展自身指纹格式（16 个十六进制字符）的目录，以及符合自身命名规则的暂存图片。
 `remoteDir` 下的其他内容只会被计数并原样留下，因此把这个设置指向一个共享目录，也不会让清理造成连带损害。
