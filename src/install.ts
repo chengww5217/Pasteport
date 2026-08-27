@@ -166,7 +166,7 @@ async function showManualInstructions(
 ): Promise<void> {
   const rendered =
     manager === undefined
-      ? `<your package manager> install ${packages.join(' ')}`
+      ? `${vscode.l10n.t('<your package manager>')} install ${packages.join(' ')}`
       : renderCommand(...installArgv(manager, packages));
 
   log.info(`install ${packages.join(' ')} by running: ${rendered}`);

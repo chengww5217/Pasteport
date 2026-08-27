@@ -67,6 +67,12 @@ export function normalizeRemoteDir(value: string): string {
  * file called ``x`id`.png`` would otherwise carry live shell syntax to a prompt.
  * The remote name is cosmetic, which makes dropping a character far cheaper than
  * that risk.
+ *
+ * The rest of the shell's metacharacters stay: `(`, `)` and `&` are ordinary in
+ * names a screenshot tool produces, and stripping them would mangle the common
+ * case to half-solve a problem `quoting: shell` solves properly. Substitution is
+ * singled out because it is the form that runs a command from inside what looks
+ * like a file name.
  */
 export function sanitizeFileName(name: string): string {
   const base = name.split(/[/\\]/).pop() ?? '';

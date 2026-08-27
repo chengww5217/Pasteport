@@ -5,7 +5,7 @@
   "command.cancelTransfer.title": "転送をキャンセル",
   "command.cleanUpRemoteFiles.title": "リモートのファイルを整理",
   "command.diagnose.title": "診断",
-  "config.remoteDir.description": "貼り付けたファイルを置くリモートホスト上の絶対 POSIX ディレクトリ。空にすると、リモートホスト自身の一時ディレクトリ (`TMPDIR`、なければ `/tmp`) の下の `pasteport` サブディレクトリを使います。`~` は展開されません。",
+  "config.remoteDir.description": "貼り付けたファイルを置くリモートホスト上の絶対 POSIX ディレクトリ。空にすると、リモートホスト自身の一時ディレクトリ (`TMPDIR`、なければ `/tmp` と `/var/tmp` のうち最初に存在するもの) の下の `pasteport` サブディレクトリを使います。`~` は展開されません。",
   "config.quoting.description": "ターミナルに挿入するリモートパスの引用方法。",
   "config.quoting.auto": "現在は none と同じ動作です。TUI の引用符の扱いが確認できたら変わります。",
   "config.quoting.shell": "特殊文字を含むパスをシングルクォートで囲みます。シェルに貼る場合向けです。",

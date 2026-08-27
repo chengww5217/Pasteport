@@ -5,7 +5,7 @@
   "command.cancelTransfer.title": "전송 취소",
   "command.cleanUpRemoteFiles.title": "원격 파일 정리",
   "command.diagnose.title": "진단",
-  "config.remoteDir.description": "붙여넣은 파일이 저장될 원격 호스트의 절대 POSIX 디렉터리입니다. 비워 두면 원격 호스트 자체의 임시 디렉터리(`TMPDIR`, 없으면 `/tmp`) 아래의 `pasteport` 하위 디렉터리를 사용합니다. `~`는 확장되지 않습니다.",
+  "config.remoteDir.description": "붙여넣은 파일이 저장될 원격 호스트의 절대 POSIX 디렉터리입니다. 비워 두면 원격 호스트 자체의 임시 디렉터리(`TMPDIR`, 없으면 `/tmp`와 `/var/tmp` 중 먼저 존재하는 것) 아래의 `pasteport` 하위 디렉터리를 사용합니다. `~`는 확장되지 않습니다.",
   "config.quoting.description": "터미널에 삽입되는 원격 경로의 인용 방식입니다.",
   "config.quoting.auto": "현재는 none과 같습니다. TUI의 인용부호 처리가 확인되면 조정됩니다.",
   "config.quoting.shell": "특수 문자가 있는 경로를 작은따옴표로 감쌉니다. 셸에서 사용할 때 적합합니다.",

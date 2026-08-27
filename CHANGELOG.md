@@ -29,7 +29,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   (`/proc/self/environ`), falling back to the first of `/tmp` and `/var/tmp` that exists, and then
   to `/tmp` with a warning. Files land under a `pasteport` subdirectory of whatever was chosen. A
   host that points `TMPDIR` elsewhere is no longer ignored; setting the value explicitly still skips
-  detection. Detection costs at most two round trips, once per remote host per session.
+  detection. Detection is a handful of reads, paid once per remote host per session.
 - `Pasteport: Diagnose` reports the resolved remote directory alongside the configured one.
 
 ### Fixed
@@ -42,8 +42,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   actually answered. A detection that ran before the remote file system was serving no longer pins
   `/tmp` for the rest of the session, and a half-dead connection can no longer leave the paste
   command waiting forever.
-- Backtick and `$` are stripped from remote file names. `quoting: auto` inserts paths verbatim, so a
-  file called ``x`id`.png`` used to carry live shell syntax to the prompt.
+- Backtick and `$` are stripped from remote file names, so a file called ``x`id`.png`` no longer
+  carries a command substitution into the prompt. Other shell metacharacters are left alone — `(` and
+  `)` are ordinary in screenshot names — so a name pasted verbatim can still need `quoting: shell` if
+  a shell is going to parse the line.
 - The Windows reader validates that the clipboard's `PNG` flavour really is a PNG before staging it,
   falling back to the bitmap when it is not — the Linux reader already did — and disposes the
   clipboard stream it reads.

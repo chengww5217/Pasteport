@@ -382,9 +382,10 @@ async function confirmSlowTransfer(bytes: number, seconds: number): Promise<bool
 /**
  * The message a failed transfer is reported with.
  *
- * Translated, because it is shown in a dialog; the log line that accompanies it
- * carries the same text, which is the accepted cost of not maintaining two
- * wordings for one failure.
+ * The cases we recognise are translated, because they are shown in a dialog; the
+ * log line that accompanies them carries the same text, which is the accepted
+ * cost of not maintaining two wordings for one failure. The final fallback is
+ * whatever the thrown value said, which is untranslatable by nature.
  */
 function describeFsError(err: unknown): string {
   if (err instanceof vscode.FileSystemError) {

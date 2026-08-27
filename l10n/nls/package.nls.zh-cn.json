@@ -5,7 +5,7 @@
   "command.cancelTransfer.title": "取消传输",
   "command.cleanUpRemoteFiles.title": "清理远程文件",
   "command.diagnose.title": "诊断",
-  "config.remoteDir.description": "远程主机上存放粘贴文件的绝对 POSIX 目录。留空则使用远程主机自己的临时目录（其 `TMPDIR`，否则回退到 `/tmp`）下的 `pasteport` 子目录。`~` 不会被展开。",
+  "config.remoteDir.description": "远程主机上存放粘贴文件的绝对 POSIX 目录。留空则使用远程主机自己的临时目录（其 `TMPDIR`，否则取 `/tmp` 与 `/var/tmp` 中第一个存在的）下的 `pasteport` 子目录。`~` 不会被展开。",
   "config.quoting.description": "插入终端的远程路径如何加引号。",
   "config.quoting.auto": "目前等同于 none；待确认 TUI 的引号行为后会自动适配。",
   "config.quoting.shell": "为包含特殊字符的路径加单引号，适用于 shell。",

@@ -1,4 +1,5 @@
 {
+  "<your package manager>": "<お使いのパッケージマネージャー>",
   "Add Setting": "設定を追加",
   "Don't Ask Again": "今後は表示しない",
   "Estimated {0} at the last measured speed.": "前回計測した速度で約 {0} かかります。",

@@ -5,7 +5,7 @@
   "command.cancelTransfer.title": "取消傳輸",
   "command.cleanUpRemoteFiles.title": "清理遠端檔案",
   "command.diagnose.title": "診斷",
-  "config.remoteDir.description": "遠端主機上存放貼上檔案的絕對 POSIX 目錄。留空則使用遠端主機自己的暫存目錄（其 `TMPDIR`，否則回退到 `/tmp`）下的 `pasteport` 子目錄。`~` 不會展開。",
+  "config.remoteDir.description": "遠端主機上存放貼上檔案的絕對 POSIX 目錄。留空則使用遠端主機自己的暫存目錄（其 `TMPDIR`，否則取 `/tmp` 與 `/var/tmp` 中第一個存在的）下的 `pasteport` 子目錄。`~` 不會展開。",
   "config.quoting.description": "插入終端機的遠端路徑如何加引號。",
   "config.quoting.auto": "目前等同於 none；待確認 TUI 的引號行為後會自動調整。",
   "config.quoting.shell": "為含有特殊字元的路徑加上單引號，適用於 shell。",

@@ -5,7 +5,7 @@
   "command.cancelTransfer.title": "Annuler le transfert",
   "command.cleanUpRemoteFiles.title": "Nettoyer les fichiers distants",
   "command.diagnose.title": "Diagnostiquer",
-  "config.remoteDir.description": "Répertoire POSIX absolu sur l'hôte distant où atterrissent les fichiers collés. Laissez vide pour utiliser le répertoire temporaire de l'hôte lui-même (son `TMPDIR`, sinon `/tmp`) avec un sous-répertoire `pasteport`. `~` n'est pas développé.",
+  "config.remoteDir.description": "Répertoire POSIX absolu sur l'hôte distant où atterrissent les fichiers collés. Laissez vide pour utiliser le répertoire temporaire de l'hôte lui-même (son `TMPDIR`, sinon le premier de `/tmp` et `/var/tmp` qui existe) avec un sous-répertoire `pasteport`. `~` n'est pas développé.",
   "config.quoting.description": "Comment les chemins distants sont mis entre guillemets lors de l'insertion dans le terminal.",
   "config.quoting.auto": "Équivalent à none pour l'instant ; s'adaptera une fois le comportement des TUI vérifié.",
   "config.quoting.shell": "Mettre entre apostrophes les chemins contenant des caractères spéciaux, pour un shell.",

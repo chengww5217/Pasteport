@@ -5,7 +5,7 @@
   "command.cancelTransfer.title": "Cancel Transfer",
   "command.cleanUpRemoteFiles.title": "Clean Up Remote Files",
   "command.diagnose.title": "Diagnose",
-  "config.remoteDir.description": "Absolute POSIX directory on the remote host where pasted files land. Leave empty to use the remote host's own temp directory (its `TMPDIR`, falling back to `/tmp`) with a `pasteport` subdirectory. `~` is not expanded.",
+  "config.remoteDir.description": "Absolute POSIX directory on the remote host where pasted files land. Leave empty to use the remote host's own temp directory (its `TMPDIR`, otherwise the first of `/tmp` and `/var/tmp` that exists) with a `pasteport` subdirectory. `~` is not expanded.",
   "config.quoting.description": "How remote paths are quoted when inserted into the terminal.",
   "config.quoting.auto": "Currently equivalent to none; will adapt once TUI quoting behaviour is verified.",
   "config.quoting.shell": "Single-quote paths that contain special characters, for use in a shell.",

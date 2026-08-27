@@ -1,4 +1,5 @@
 {
+  "<your package manager>": "<votre gestionnaire de paquets>",
   "Add Setting": "Ajouter le paramètre",
   "Don't Ask Again": "Ne plus demander",
   "Estimated {0} at the last measured speed.": "Environ {0} d'après la dernière vitesse mesurée.",

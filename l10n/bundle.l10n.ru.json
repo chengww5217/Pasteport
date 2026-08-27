@@ -1,4 +1,5 @@
 {
+  "<your package manager>": "<ваш пакетный менеджер>",
   "Add Setting": "Добавить параметр",
   "Don't Ask Again": "Больше не спрашивать",
   "Estimated {0} at the last measured speed.": "Примерно {0} при последней измеренной скорости.",
