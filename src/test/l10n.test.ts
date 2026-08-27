@@ -144,7 +144,7 @@ test('translations keep every placeholder the English string has', () => {
 
 test('package.json placeholders all resolve, in every language', () => {
   const manifest = fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8');
-  const used = new Set([...manifest.matchAll(/"%([^%"]+)%"/g)].map((m) => m[1] as string));
+  const used = new Set([...manifest.matchAll(/"%([^%"]+)%"/g)].map((m) => m[1]));
   const english = readJson(path.join(NLS_DIR, 'package.nls.json'));
 
   assert.ok(used.size > 0, 'package.json uses no %nls% placeholders');
