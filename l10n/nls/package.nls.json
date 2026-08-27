@@ -5,7 +5,7 @@
   "command.cancelTransfer.title": "Cancel Transfer",
   "command.cleanUpRemoteFiles.title": "Clean Up Remote Files",
   "command.diagnose.title": "Diagnose",
-  "config.remoteDir.description": "Absolute POSIX directory on the remote host where pasted files land. Leave empty to use the remote host's own temp directory (its `TMPDIR`, otherwise the first of `/tmp` and `/var/tmp` that exists) with a `pasteport` subdirectory. `~` is not expanded.",
+  "config.remoteDir.description": "Absolute POSIX directory on the remote host where pasted files land. Leave empty to use the remote host's own temp directory (its `TMPDIR`, otherwise the first of `/tmp` and `/var/tmp` that exists) with a `pasteport` subdirectory. `~` is not expanded. [Show resolved directory](command:pasteport.showRemoteDir)",
   "config.quoting.description": "How remote paths are quoted when inserted into the terminal.",
   "config.quoting.auto": "Currently equivalent to none; will adapt once TUI quoting behaviour is verified.",
   "config.quoting.shell": "Single-quote paths that contain special characters, for use in a shell.",
@@ -13,5 +13,6 @@
   "config.trailingSpace.description": "Append a space after the inserted path so you can keep typing.",
   "config.confirmAboveSeconds.description": "Ask before transfers estimated to take longer than this many seconds, using the measured transfer rate. Set to `0` to never ask.",
   "config.ttlHours.description": "Age at which pasted files are removed from the remote host and the local staging directory. Set to `0` to disable cleanup.",
-  "config.bracketedPaste.description": "Wrap the inserted path in bracketed paste markers (`ESC[200~` … `ESC[201~`). Off by default; compatibility across TUIs is unverified."
+  "config.bracketedPaste.description": "Wrap the inserted path in bracketed paste markers (`ESC[200~` … `ESC[201~`). Off by default; compatibility across TUIs is unverified.",
+  "command.showRemoteDir.title": "Show Resolved Remote Directory"
 }

@@ -5,7 +5,7 @@
   "command.cancelTransfer.title": "取消傳輸",
   "command.cleanUpRemoteFiles.title": "清理遠端檔案",
   "command.diagnose.title": "診斷",
-  "config.remoteDir.description": "遠端主機上存放貼上檔案的絕對 POSIX 目錄。留空則使用遠端主機自己的暫存目錄（其 `TMPDIR`，否則取 `/tmp` 與 `/var/tmp` 中第一個存在的）下的 `pasteport` 子目錄。`~` 不會展開。",
+  "config.remoteDir.description": "遠端主機上存放貼上檔案的絕對 POSIX 目錄。留空則使用遠端主機自己的暫存目錄（其 `TMPDIR`，否則取 `/tmp` 與 `/var/tmp` 中第一個存在的）下的 `pasteport` 子目錄。`~` 不會展開。 [顯示解析後的目錄](command:pasteport.showRemoteDir)",
   "config.quoting.description": "插入終端機的遠端路徑如何加引號。",
   "config.quoting.auto": "目前等同於 none；待確認 TUI 的引號行為後會自動調整。",
   "config.quoting.shell": "為含有特殊字元的路徑加上單引號，適用於 shell。",
@@ -13,5 +13,6 @@
   "config.trailingSpace.description": "在插入的路徑後加上一個空格，方便繼續輸入。",
   "config.confirmAboveSeconds.description": "依實測傳輸速率估算，若耗時超過此秒數則先詢問。設為 `0` 表示永不詢問。",
   "config.ttlHours.description": "貼上的檔案在遠端主機與本機暫存目錄中保留的小時數，超過即清理。設為 `0` 表示停用清理。",
-  "config.bracketedPaste.description": "以括號貼上標記（`ESC[200~` … `ESC[201~`）包住插入的路徑。預設關閉；各 TUI 的相容性尚未驗證。"
+  "config.bracketedPaste.description": "以括號貼上標記（`ESC[200~` … `ESC[201~`）包住插入的路徑。預設關閉；各 TUI 的相容性尚未驗證。",
+  "command.showRemoteDir.title": "顯示解析後的遠端目錄"
 }

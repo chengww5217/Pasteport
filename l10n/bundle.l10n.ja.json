@@ -27,5 +27,8 @@
   "the remote connection is unavailable — reconnect the window and try again": "リモート接続が利用できません — ウィンドウを再接続してからやり直してください",
   "the remote directory is not writable — check pasteport.remoteDir": "リモートのディレクトリに書き込めません — pasteport.remoteDir を確認してください",
   "{0} ({1}) — {2} elapsed, ~{3} left": "{0} ({1}) — 経過 {2}、残り約 {3}",
-  "{0} is not installed, so the clipboard cannot be read": "{0} がインストールされていないため、クリップボードを読み取れません"
+  "{0} is not installed, so the clipboard cannot be read": "{0} がインストールされていないため、クリップボードを読み取れません",
+  "Pasteport: no remote window in this session; nothing resolved.": "Pasteport: このセッションにはリモート ウィンドウがないため、解決するものはありません。",
+  "Pasteport: files land in \"{0}\" (auto-detected).": "Pasteport: ファイルは \"{0}\" に保存されます（自動検出）。",
+  "Pasteport: files land in \"{0}\" (as configured).": "Pasteport: ファイルは \"{0}\" に保存されます（設定どおり）。"
 }

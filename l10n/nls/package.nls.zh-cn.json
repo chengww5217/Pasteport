@@ -5,7 +5,7 @@
   "command.cancelTransfer.title": "取消传输",
   "command.cleanUpRemoteFiles.title": "清理远程文件",
   "command.diagnose.title": "诊断",
-  "config.remoteDir.description": "远程主机上存放粘贴文件的绝对 POSIX 目录。留空则使用远程主机自己的临时目录（其 `TMPDIR`，否则取 `/tmp` 与 `/var/tmp` 中第一个存在的）下的 `pasteport` 子目录。`~` 不会被展开。",
+  "config.remoteDir.description": "远程主机上存放粘贴文件的绝对 POSIX 目录。留空则使用远程主机自己的临时目录（其 `TMPDIR`，否则取 `/tmp` 与 `/var/tmp` 中第一个存在的）下的 `pasteport` 子目录。`~` 不会被展开。 [显示解析后的目录](command:pasteport.showRemoteDir)",
   "config.quoting.description": "插入终端的远程路径如何加引号。",
   "config.quoting.auto": "目前等同于 none；待确认 TUI 的引号行为后会自动适配。",
   "config.quoting.shell": "为包含特殊字符的路径加单引号，适用于 shell。",
@@ -13,5 +13,6 @@
   "config.trailingSpace.description": "在插入的路径后追加一个空格，方便继续输入。",
   "config.confirmAboveSeconds.description": "按实测传输速率估算，若耗时超过该秒数则先询问。设为 `0` 表示从不询问。",
   "config.ttlHours.description": "粘贴的文件在远程主机和本地暂存目录中保留的小时数，超过即清理。设为 `0` 表示禁用清理。",
-  "config.bracketedPaste.description": "用括号粘贴标记（`ESC[200~` … `ESC[201~`）包裹插入的路径。默认关闭；各 TUI 的兼容性尚未验证。"
+  "config.bracketedPaste.description": "用括号粘贴标记（`ESC[200~` … `ESC[201~`）包裹插入的路径。默认关闭；各 TUI 的兼容性尚未验证。",
+  "command.showRemoteDir.title": "显示解析后的远程目录"
 }

@@ -27,5 +27,8 @@
   "the remote connection is unavailable — reconnect the window and try again": "la connexion distante est indisponible — reconnectez la fenêtre et réessayez",
   "the remote directory is not writable — check pasteport.remoteDir": "le répertoire distant n'est pas accessible en écriture — vérifiez pasteport.remoteDir",
   "{0} ({1}) — {2} elapsed, ~{3} left": "{0} ({1}) — {2} écoulé, ~{3} restant",
-  "{0} is not installed, so the clipboard cannot be read": "{0} n'est pas installé, le presse-papiers est donc illisible"
+  "{0} is not installed, so the clipboard cannot be read": "{0} n'est pas installé, le presse-papiers est donc illisible",
+  "Pasteport: no remote window in this session; nothing resolved.": "Pasteport : aucune fenêtre distante dans cette session ; rien à résoudre.",
+  "Pasteport: files land in \"{0}\" (auto-detected).": "Pasteport : les fichiers aboutissent dans « {0} » (détection automatique).",
+  "Pasteport: files land in \"{0}\" (as configured).": "Pasteport : les fichiers aboutissent dans « {0} » (selon la configuration)."
 }

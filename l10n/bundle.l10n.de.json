@@ -27,5 +27,8 @@
   "the remote connection is unavailable — reconnect the window and try again": "die entfernte Verbindung ist nicht verfügbar — verbinden Sie das Fenster neu und versuchen Sie es erneut",
   "the remote directory is not writable — check pasteport.remoteDir": "das entfernte Verzeichnis ist nicht beschreibbar — prüfen Sie pasteport.remoteDir",
   "{0} ({1}) — {2} elapsed, ~{3} left": "{0} ({1}) — {2} vergangen, ~{3} übrig",
-  "{0} is not installed, so the clipboard cannot be read": "{0} ist nicht installiert, daher kann die Zwischenablage nicht gelesen werden"
+  "{0} is not installed, so the clipboard cannot be read": "{0} ist nicht installiert, daher kann die Zwischenablage nicht gelesen werden",
+  "Pasteport: no remote window in this session; nothing resolved.": "Pasteport: kein Remote-Fenster in dieser Sitzung; nichts aufzulösen.",
+  "Pasteport: files land in \"{0}\" (auto-detected).": "Pasteport: Dateien landen unter „{0}“ (automatisch erkannt).",
+  "Pasteport: files land in \"{0}\" (as configured).": "Pasteport: Dateien landen unter „{0}“ (wie konfiguriert)."
 }

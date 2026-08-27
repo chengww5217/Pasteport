@@ -27,5 +27,8 @@
   "the remote connection is unavailable — reconnect the window and try again": "遠端連線不可用 — 請重新連線視窗後再試",
   "the remote directory is not writable — check pasteport.remoteDir": "遠端目錄無法寫入 — 請檢查 pasteport.remoteDir",
   "{0} ({1}) — {2} elapsed, ~{3} left": "{0}（{1}）— 已用 {2}，約剩 {3}",
-  "{0} is not installed, so the clipboard cannot be read": "未安裝 {0}，無法讀取剪貼簿"
+  "{0} is not installed, so the clipboard cannot be read": "未安裝 {0}，無法讀取剪貼簿",
+  "Pasteport: no remote window in this session; nothing resolved.": "Pasteport：目前工作階段沒有遠端視窗，未解析任何路徑。",
+  "Pasteport: files land in \"{0}\" (auto-detected).": "Pasteport：檔案將落在 \"{0}\"（自動偵測）。",
+  "Pasteport: files land in \"{0}\" (as configured).": "Pasteport：檔案將落在 \"{0}\"（依設定）。"
 }

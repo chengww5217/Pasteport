@@ -94,7 +94,24 @@ export function activate(context: vscode.ExtensionContext): void {
 
     vscode.commands.registerCommand('pasteport.diagnose', () =>
       diagnose(log, reader, transfer, remoteDirs, staging)
-    )
+    ),
+
+    vscode.commands.registerCommand('pasteport.showRemoteDir', async () => {
+      const config = readConfig(log);
+      const template = remoteTemplateUri();
+      if (template === undefined || !isWritableRemote(template)) {
+        void vscode.window.showInformationMessage(
+          vscode.l10n.t('Pasteport: no remote window in this session; nothing resolved.')
+        );
+        return;
+      }
+      const dir = await remoteDirs.resolve(template, config.remoteDir);
+      void vscode.window.showInformationMessage(
+        config.remoteDir === undefined
+          ? vscode.l10n.t('Pasteport: files land in "{0}" (auto-detected).', dir)
+          : vscode.l10n.t('Pasteport: files land in "{0}" (as configured).', dir)
+      );
+    })
   );
 
   log.info(`Pasteport activated on ${process.platform}, VS Code ${vscode.version}`);

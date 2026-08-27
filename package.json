@@ -61,6 +61,11 @@
         "command": "pasteport.diagnose",
         "title": "%command.diagnose.title%",
         "category": "Pasteport"
+      },
+      {
+        "command": "pasteport.showRemoteDir",
+        "title": "%command.showRemoteDir.title%",
+        "category": "Pasteport"
       }
     ],
     "keybindings": [

@@ -5,7 +5,7 @@
   "command.cancelTransfer.title": "Übertragung abbrechen",
   "command.cleanUpRemoteFiles.title": "Entfernte Dateien aufräumen",
   "command.diagnose.title": "Diagnose",
-  "config.remoteDir.description": "Absolutes POSIX-Verzeichnis auf dem entfernten Host, in dem eingefügte Dateien landen. Leer lassen, um das temporäre Verzeichnis des Hosts selbst (dessen `TMPDIR`, sonst das erste von `/tmp` und `/var/tmp`, das existiert) mit einem Unterverzeichnis `pasteport` zu verwenden. `~` wird nicht erweitert.",
+  "config.remoteDir.description": "Absolutes POSIX-Verzeichnis auf dem entfernten Host, in dem eingefügte Dateien landen. Leer lassen, um das temporäre Verzeichnis des Hosts selbst (dessen `TMPDIR`, sonst das erste von `/tmp` und `/var/tmp`, das existiert) mit einem Unterverzeichnis `pasteport` zu verwenden. `~` wird nicht erweitert. [Aufgelöstes Verzeichnis anzeigen](command:pasteport.showRemoteDir)",
   "config.quoting.description": "Wie entfernte Pfade beim Einfügen in das Terminal in Anführungszeichen gesetzt werden.",
   "config.quoting.auto": "Derzeit gleichbedeutend mit none; wird angepasst, sobald das Verhalten von TUIs geprüft ist.",
   "config.quoting.shell": "Pfade mit Sonderzeichen in einfache Anführungszeichen setzen, für die Verwendung in einer Shell.",
@@ -13,5 +13,6 @@
   "config.trailingSpace.description": "Ein Leerzeichen an den eingefügten Pfad anhängen, damit Sie weitertippen können.",
   "config.confirmAboveSeconds.description": "Vor Übertragungen fragen, die laut gemessener Rate länger als diese Anzahl Sekunden dauern. `0` fragt nie.",
   "config.ttlHours.description": "Alter, ab dem eingefügte Dateien auf dem entfernten Host und im lokalen Zwischenverzeichnis entfernt werden. `0` deaktiviert das Aufräumen.",
-  "config.bracketedPaste.description": "Den eingefügten Pfad in Bracketed-Paste-Markierungen (`ESC[200~` … `ESC[201~`) einschließen. Standardmäßig aus; die Kompatibilität über TUIs hinweg ist ungeprüft."
+  "config.bracketedPaste.description": "Den eingefügten Pfad in Bracketed-Paste-Markierungen (`ESC[200~` … `ESC[201~`) einschließen. Standardmäßig aus; die Kompatibilität über TUIs hinweg ist ungeprüft.",
+  "command.showRemoteDir.title": "Aufgelöstes Remoteverzeichnis anzeigen"
 }

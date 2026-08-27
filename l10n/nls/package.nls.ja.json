@@ -5,7 +5,7 @@
   "command.cancelTransfer.title": "転送をキャンセル",
   "command.cleanUpRemoteFiles.title": "リモートのファイルを整理",
   "command.diagnose.title": "診断",
-  "config.remoteDir.description": "貼り付けたファイルを置くリモートホスト上の絶対 POSIX ディレクトリ。空にすると、リモートホスト自身の一時ディレクトリ (`TMPDIR`、なければ `/tmp` と `/var/tmp` のうち最初に存在するもの) の下の `pasteport` サブディレクトリを使います。`~` は展開されません。",
+  "config.remoteDir.description": "貼り付けたファイルを置くリモートホスト上の絶対 POSIX ディレクトリ。空にすると、リモートホスト自身の一時ディレクトリ (`TMPDIR`、なければ `/tmp` と `/var/tmp` のうち最初に存在するもの) の下の `pasteport` サブディレクトリを使います。`~` は展開されません。 [解決済みのディレクトリを表示](command:pasteport.showRemoteDir)",
   "config.quoting.description": "ターミナルに挿入するリモートパスの引用方法。",
   "config.quoting.auto": "現在は none と同じ動作です。TUI の引用符の扱いが確認できたら変わります。",
   "config.quoting.shell": "特殊文字を含むパスをシングルクォートで囲みます。シェルに貼る場合向けです。",
@@ -13,5 +13,6 @@
   "config.trailingSpace.description": "挿入したパスの後ろに空白を追加し、そのまま入力を続けられるようにします。",
   "config.confirmAboveSeconds.description": "実測した転送速度から見積もった所要時間がこの秒数を超える場合に確認します。`0` で確認しません。",
   "config.ttlHours.description": "貼り付けたファイルをリモートホストとローカルの一時ディレクトリから削除するまでの時間。`0` で整理を無効にします。",
-  "config.bracketedPaste.description": "挿入するパスをブラケットペーストのマーカー (`ESC[200~` … `ESC[201~`) で囲みます。既定はオフ。TUI ごとの互換性は未検証です。"
+  "config.bracketedPaste.description": "挿入するパスをブラケットペーストのマーカー (`ESC[200~` … `ESC[201~`) で囲みます。既定はオフ。TUI ごとの互換性は未検証です。",
+  "command.showRemoteDir.title": "解決済みのリモートディレクトリを表示"
 }

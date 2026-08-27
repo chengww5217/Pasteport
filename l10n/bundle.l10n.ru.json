@@ -27,5 +27,8 @@
   "the remote connection is unavailable — reconnect the window and try again": "удалённое подключение недоступно — переподключите окно и попробуйте снова",
   "the remote directory is not writable — check pasteport.remoteDir": "удалённый каталог недоступен для записи — проверьте pasteport.remoteDir",
   "{0} ({1}) — {2} elapsed, ~{3} left": "{0} ({1}) — прошло {2}, осталось ~{3}",
-  "{0} is not installed, so the clipboard cannot be read": "{0} не установлен, поэтому буфер обмена прочитать нельзя"
+  "{0} is not installed, so the clipboard cannot be read": "{0} не установлен, поэтому буфер обмена прочитать нельзя",
+  "Pasteport: no remote window in this session; nothing resolved.": "Pasteport: в этой сессии нет удалённого окна; ничего не вычислено.",
+  "Pasteport: files land in \"{0}\" (auto-detected).": "Pasteport: файлы попадут в «{0}» (определено автоматически).",
+  "Pasteport: files land in \"{0}\" (as configured).": "Pasteport: файлы попадут в «{0}» (как указано в настройках)."
 }

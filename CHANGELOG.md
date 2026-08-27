@@ -17,6 +17,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Translated documentation: `docs/README.zh-CN.md`, `docs/README.zh-TW.md` and `docs/README.ja.md`,
   linked from the top of every README. They are excluded from the vsix, where the Marketplace shows
   the English one.
+- `Pasteport: Show Resolved Remote Directory`, which reports the directory a paste will actually use;
+  the `pasteport.remoteDir` setting description carries a link to it, right next to the input field.
 
 ### Changed
 

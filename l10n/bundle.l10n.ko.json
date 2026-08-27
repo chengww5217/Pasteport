@@ -27,5 +27,8 @@
   "the remote connection is unavailable — reconnect the window and try again": "원격 연결을 사용할 수 없습니다 — 창을 다시 연결한 후 시도하세요",
   "the remote directory is not writable — check pasteport.remoteDir": "원격 디렉터리에 쓸 수 없습니다 — pasteport.remoteDir을 확인하세요",
   "{0} ({1}) — {2} elapsed, ~{3} left": "{0}({1}) — {2} 경과, 약 {3} 남음",
-  "{0} is not installed, so the clipboard cannot be read": "{0}이(가) 설치되지 않아 클립보드를 읽을 수 없습니다"
+  "{0} is not installed, so the clipboard cannot be read": "{0}이(가) 설치되지 않아 클립보드를 읽을 수 없습니다",
+  "Pasteport: no remote window in this session; nothing resolved.": "Pasteport: 이 세션에는 원격 창이 없어 해석한 항목이 없습니다.",
+  "Pasteport: files land in \"{0}\" (auto-detected).": "Pasteport: 파일은 \"{0}\"에 저장됩니다(자동 감지).",
+  "Pasteport: files land in \"{0}\" (as configured).": "Pasteport: 파일은 \"{0}\"에 저장됩니다(설정한 대로)."
 }

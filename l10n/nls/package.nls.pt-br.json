@@ -5,7 +5,7 @@
   "command.cancelTransfer.title": "Cancelar a transferência",
   "command.cleanUpRemoteFiles.title": "Limpar os arquivos remotos",
   "command.diagnose.title": "Diagnosticar",
-  "config.remoteDir.description": "Diretório POSIX absoluto no host remoto onde os arquivos colados ficam. Deixe vazio para usar o diretório temporário do próprio host (o `TMPDIR` dele, ou o primeiro entre `/tmp` e `/var/tmp` que existir) com um subdiretório `pasteport`. `~` não é expandido.",
+  "config.remoteDir.description": "Diretório POSIX absoluto no host remoto onde os arquivos colados ficam. Deixe vazio para usar o diretório temporário do próprio host (o `TMPDIR` dele, ou o primeiro entre `/tmp` e `/var/tmp` que existir) com um subdiretório `pasteport`. `~` não é expandido. [Mostrar o diretório resolvido](command:pasteport.showRemoteDir)",
   "config.quoting.description": "Como os caminhos remotos são colocados entre aspas ao serem inseridos no terminal.",
   "config.quoting.auto": "Hoje equivale a none; será ajustado quando o comportamento dos TUIs for verificado.",
   "config.quoting.shell": "Colocar entre apóstrofos os caminhos com caracteres especiais, para uso em um shell.",
@@ -13,5 +13,6 @@
   "config.trailingSpace.description": "Acrescentar um espaço depois do caminho inserido para você continuar digitando.",
   "config.confirmAboveSeconds.description": "Perguntar antes de transferências que, pela taxa medida, devem passar deste número de segundos. `0` nunca pergunta.",
   "config.ttlHours.description": "Idade a partir da qual os arquivos colados são removidos do host remoto e do diretório temporário local. `0` desativa a limpeza.",
-  "config.bracketedPaste.description": "Envolver o caminho inserido em marcadores de bracketed paste (`ESC[200~` … `ESC[201~`). Desligado por padrão; a compatibilidade entre TUIs não foi verificada."
+  "config.bracketedPaste.description": "Envolver o caminho inserido em marcadores de bracketed paste (`ESC[200~` … `ESC[201~`). Desligado por padrão; a compatibilidade entre TUIs não foi verificada.",
+  "command.showRemoteDir.title": "Mostrar o diretório remoto resolvido"
 }
