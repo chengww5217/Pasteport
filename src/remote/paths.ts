@@ -61,13 +61,20 @@ export function normalizeRemoteDir(value: string): string {
  * Reduces an arbitrary local file name to one safe remote path segment.
  *
  * Spaces and unicode are kept — macOS screenshot names contain both, and the
- * remote side never re-parses the segment. Only characters that would change
- * the path's structure or break the protocol are removed.
+ * remote side never re-parses the segment. Two classes of character go: the ones
+ * that would change the path's structure or break the protocol, and backtick and
+ * `$`, which trigger substitution. `quoting: auto` inserts paths verbatim, so a
+ * file called ``x`id`.png`` would otherwise carry live shell syntax to a prompt.
+ * The remote name is cosmetic, which makes dropping a character far cheaper than
+ * that risk.
  */
 export function sanitizeFileName(name: string): string {
   const base = name.split(/[/\\]/).pop() ?? '';
-  /* eslint-disable-next-line no-control-regex -- stripping C0/C1 controls is the point */
-  const cleaned = base.replace(/[\u0000-\u001f\u007f]/g, '').trim();
+  const cleaned = base
+    /* eslint-disable-next-line no-control-regex -- stripping C0/C1 controls is the point */
+    .replace(/[\u0000-\u001f\u007f]/g, '')
+    .replace(/[`$]/g, '')
+    .trim();
 
   if (cleaned === '' || cleaned === '.' || cleaned === '..') return 'file';
   return truncateName(cleaned);

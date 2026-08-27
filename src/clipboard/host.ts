@@ -7,8 +7,14 @@ import { parseClipboardPayload, type ClipboardContent } from './types';
 
 const execFileAsync = promisify(execFile);
 
-/** Only paths and type names come back over stdout, never image bytes. */
-const MAX_STDOUT_BYTES = 1024 * 1024;
+/**
+ * Only paths and type names come back over stdout, never image bytes.
+ *
+ * Generous rather than tight: a selection of a few thousand files is unusual but
+ * legitimate, and exceeding this kills the reader with ENOBUFS, which surfaces
+ * as a pass-through the user cannot explain.
+ */
+const MAX_STDOUT_BYTES = 8 * 1024 * 1024;
 
 /**
  * Runs one of the platform reader programs and parses its JSON line.

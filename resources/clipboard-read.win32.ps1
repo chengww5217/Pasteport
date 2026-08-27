@@ -80,6 +80,17 @@ function Get-StagedImagePath {
     return (Join-Path $StagingDir "clipboard-$stamp.png")
 }
 
+function Test-PngMagic {
+    param([byte[]] $Bytes)
+
+    $magic = [byte[]] (0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A)
+    if ($null -eq $Bytes -or $Bytes.Length -lt $magic.Length) { return $false }
+    for ($i = 0; $i -lt $magic.Length; $i++) {
+        if ($Bytes[$i] -ne $magic[$i]) { return $false }
+    }
+    return $true
+}
+
 function Save-ClipboardImage {
     param($DataObject)
 
@@ -91,15 +102,23 @@ function Save-ClipboardImage {
     if ($DataObject.GetDataPresent('PNG')) {
         $stream = $DataObject.GetData('PNG')
         if ($stream -is [System.IO.Stream]) {
-            if ($stream.CanSeek) { [void] $stream.Seek(0, [System.IO.SeekOrigin]::Begin) }
+            $bytes = $null
             $buffer = New-Object System.IO.MemoryStream
             try {
+                if ($stream.CanSeek) { [void] $stream.Seek(0, [System.IO.SeekOrigin]::Begin) }
                 $stream.CopyTo($buffer)
-                [System.IO.File]::WriteAllBytes($target, $buffer.ToArray())
+                $bytes = $buffer.ToArray()
             } finally {
                 $buffer.Dispose()
+                $stream.Dispose()
             }
-            return $target
+            # The flavour claims PNG. If the bytes disagree, staging them would
+            # hand an agent a file that lies about its type, so the bitmap route
+            # below — which produces a real PNG — takes over instead.
+            if (Test-PngMagic $bytes) {
+                [System.IO.File]::WriteAllBytes($target, $bytes)
+                return $target
+            }
         }
     }
 

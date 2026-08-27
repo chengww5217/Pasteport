@@ -51,12 +51,30 @@ export function choosePackageManager(
 /** The privilege helper: it prompts graphically, which a terminal-less GUI needs. */
 export const ELEVATOR = 'pkexec';
 
-/** Full argv, root helper included, exactly as it will be spawned. */
+/** Absolute paths, where the caller has already resolved them. */
+export interface InstallPaths {
+  /** The package manager binary; falls back to the bare name for display. */
+  manager?: string | undefined;
+  /** The privilege helper; falls back to the bare name for display. */
+  elevator?: string | undefined;
+}
+
+/**
+ * Full argv, root helper included, exactly as it will be spawned.
+ *
+ * Bare names are the right thing for instructions a human will type; a spawn
+ * should pass the paths the caller resolved, so nothing is looked up through
+ * PATH on the way to running as root.
+ */
 export function installArgv(
   manager: PackageManagerSpec,
-  packages: readonly string[]
+  packages: readonly string[],
+  paths: InstallPaths = {}
 ): [string, string[]] {
-  return [ELEVATOR, [manager.binary, ...manager.install(packages)]];
+  return [
+    paths.elevator ?? ELEVATOR,
+    [paths.manager ?? manager.binary, ...manager.install(packages)],
+  ];
 }
 
 /** The same command as one copy-pasteable line, for dialogs and the log. */

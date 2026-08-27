@@ -31,6 +31,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   actually answered. A detection that ran before the remote file system was serving no longer pins
   `/tmp` for the rest of the session, and a half-dead connection can no longer leave the paste
   command waiting forever.
+- Backtick and `$` are stripped from remote file names. `quoting: auto` inserts paths verbatim, so a
+  file called ``x`id`.png`` used to carry live shell syntax to the prompt.
+- The Windows reader validates that the clipboard's `PNG` flavour really is a PNG before staging it,
+  falling back to the bitmap when it is not — the Linux reader already did — and disposes the
+  clipboard stream it reads.
+- The Linux install helper spawns the package manager and `pkexec` by the absolute path it found
+  rather than by name, since the command runs as root.
+- A clipboard holding thousands of files no longer kills the reader with `ENOBUFS`: the output limit
+  is 8 MB rather than 1 MB. Only paths cross that pipe, never image bytes.
+- `release.yml` passes the tag version to the shell through the environment instead of interpolating
+  it into a command line.
 
 ## [0.0.1] - 2026-08-24
 

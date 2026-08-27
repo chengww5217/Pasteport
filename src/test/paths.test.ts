@@ -48,7 +48,7 @@ test('sanitizeFileName keeps names the remote side never re-parses', () => {
     'Screenshot 2026-08-24 at 10.28.15.png'
   );
   assert.equal(sanitizeFileName('屏幕截图 2026-08-24.png'), '屏幕截图 2026-08-24.png');
-  assert.equal(sanitizeFileName("it's a $(shot).png"), "it's a $(shot).png");
+  assert.equal(sanitizeFileName("it's a (shot).png"), "it's a (shot).png");
 });
 
 test('sanitizeFileName strips structure and control characters', () => {
@@ -56,6 +56,16 @@ test('sanitizeFileName strips structure and control characters', () => {
   assert.equal(sanitizeFileName('C:\\Users\\me\\shot.png'), 'shot.png');
   assert.equal(sanitizeFileName('bad\nname\u0000.png'), 'badname.png');
   assert.equal(sanitizeFileName('  spaced.png  '), 'spaced.png');
+});
+
+test('sanitizeFileName strips what a shell would substitute', () => {
+  // `quoting: auto` inserts the path verbatim, so these would be live syntax at
+  // a prompt rather than part of a file name.
+  assert.equal(sanitizeFileName('x`id`.png'), 'xid.png');
+  assert.equal(sanitizeFileName('x$(id).png'), 'x(id).png');
+  assert.equal(sanitizeFileName('$HOME.png'), 'HOME.png');
+  assert.equal(sanitizeFileName('${IFS}.png'), '{IFS}.png');
+  assert.equal(sanitizeFileName('$'), 'file');
 });
 
 test('sanitizeFileName never yields a path-traversing or empty segment', () => {

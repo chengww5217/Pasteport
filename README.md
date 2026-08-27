@@ -71,8 +71,10 @@ reason the extension is built this way:
   file URLs — a flavour the asynchronous clipboard API in a webview never exposes. Reading the
   native clipboard directly is what makes "copy a file, paste it in the terminal" work at all.
 - **Bytes take one hop.** The file is read from local disk and written through VS Code's existing
-  channel. There is no base64 round trip through an RPC boundary, so there is no size ceiling
-  beyond patience and remote disk space.
+  channel. There is no base64 round trip through an RPC boundary, so nothing is inflated on the way.
+  The one ceiling that remains is memory: `workspace.fs.writeFile` takes a buffer, so each file is
+  held in the extension host while it is sent. Screenshots and archives are unaffected; a
+  multi-gigabyte file is not what this is for.
 
 The clipboard read runs on every paste, including plain-text ones, so its cost is felt as input
 latency. On macOS it is an `osascript` (JXA) call into AppKit, measured at about **30ms** — below the
@@ -175,6 +177,12 @@ Files then land under a `pasteport` subdirectory of whatever was chosen, and onl
 subdirectory is ever written to or swept. The result is logged once per host and reported by
 `Pasteport: Diagnose`, so there is never a question about where a paste went. Setting the value
 explicitly skips detection entirely.
+
+Two things this does not solve. On a remote host you share with other people, `TMPDIR` is usually
+just `/tmp`, so `/tmp/pasteport` belongs to whoever pasted first and the next user gets a permission
+error — set `pasteport.remoteDir` to somewhere of your own, under your home directory for instance.
+And detection assumes a POSIX remote: every supported backend is Linux or macOS, and a Windows
+remote would need a path no part of this understands.
 
 About `quoting`: the target is a TUI agent that treats your input as literal text, where a quote
 character becomes part of the path and silently breaks it. `auto` therefore inserts paths verbatim

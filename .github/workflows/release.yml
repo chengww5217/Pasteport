@@ -58,9 +58,15 @@ jobs:
 
       # One artifact for every destination: what the release page offers is byte for
       # byte what Open VSX serves and what gets uploaded to the Marketplace by hand.
+      #
+      # The version reaches the shell through env, never through ${{ }} inside a run
+      # body: it is derived from a git ref, and ref names may contain characters a
+      # shell would act on — in a job that holds contents:write and OVSX_PAT.
       - name: Locate the vsix
         id: vsix
-        run: echo "path=dist/pasteport-${{ steps.version.outputs.version }}.vsix" >>"$GITHUB_OUTPUT"
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: echo "path=dist/pasteport-$VERSION.vsix" >>"$GITHUB_OUTPUT"
 
       - uses: softprops/action-gh-release@v2
         with:
@@ -71,14 +77,19 @@ jobs:
       # Requires the namespace to exist once: npx ovsx create-namespace chengww
       - name: Publish to Open VSX
         if: steps.version.outputs.prerelease == 'false' && env.OVSX_PAT != ''
-        run: npx --yes ovsx publish "${{ steps.vsix.outputs.path }}" --pat "$OVSX_PAT"
+        env:
+          VSIX_PATH: ${{ steps.vsix.outputs.path }}
+        run: npx --yes ovsx publish "$VSIX_PATH" --pat "$OVSX_PAT"
 
       - name: Note what is left to do by hand
         if: steps.vsix.outputs.path != ''
+        env:
+          VSIX_PATH: ${{ steps.vsix.outputs.path }}
+          PRERELEASE: ${{ steps.version.outputs.prerelease }}
         run: |
-          if [ "${{ steps.version.outputs.prerelease }}" = "true" ]; then
+          if [ "$PRERELEASE" = "true" ]; then
             echo "::notice::${GITHUB_REF_NAME} is a prerelease tag; the vsix is attached to the GitHub release and published nowhere."
           elif [ -z "$OVSX_PAT" ]; then
             echo "::warning::OVSX_PAT is not configured; Open VSX was skipped."
           fi
-          echo "::notice::Upload ${{ steps.vsix.outputs.path }} from the GitHub release to https://marketplace.visualstudio.com/manage to reach the VS Code Marketplace."
+          echo "::notice::Upload $VSIX_PATH from the GitHub release to https://marketplace.visualstudio.com/manage to reach the VS Code Marketplace."

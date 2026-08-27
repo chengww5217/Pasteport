@@ -43,14 +43,21 @@ export async function offerPackageInstall(
 ): Promise<void> {
   if (process.platform !== 'linux' || packages.length === 0) return;
 
-  const manager = choosePackageManager(await availableBinaries());
+  const binaries = await availableBinaries();
+  const manager = choosePackageManager((binary) => binaries.has(binary));
   if (manager === undefined) {
     log.warn(`no supported package manager found; install ${packages.join(' ')} manually`);
     await showManualInstructions(packages, undefined, log);
     return;
   }
 
-  const [command, args] = installArgv(manager, packages);
+  // Absolute paths, not bare names: this is about to run as root, and PATH is
+  // not something to trust at that point.
+  const elevator = await resolveBinary(ELEVATOR);
+  const [command, args] = installArgv(manager, packages, {
+    manager: binaries.get(manager.binary),
+    elevator,
+  });
   const rendered = renderCommand(command, args);
 
   const install = 'Install';
@@ -78,7 +85,7 @@ export async function offerPackageInstall(
     return;
   }
 
-  if (!(await binaryExists(ELEVATOR))) {
+  if (elevator === undefined) {
     log.warn(`${ELEVATOR} is not available, so the install cannot ask for authentication`);
     await showManualInstructions(packages, manager, log);
     return;
@@ -166,23 +173,27 @@ async function showManualInstructions(
   );
 }
 
-async function availableBinaries(): Promise<(binary: string) => boolean> {
-  const found = new Set<string>();
+/** Package manager name -> absolute path, for the managers this machine has. */
+async function availableBinaries(): Promise<Map<string, string>> {
+  const managers = ['apt-get', 'dnf', 'pacman', 'zypper', 'apk', 'xbps-install', 'eopkg'];
+  const found = new Map<string, string>();
+
   await Promise.all(
-    BIN_DIRS.flatMap((dir) =>
-      ['apt-get', 'dnf', 'pacman', 'zypper', 'apk', 'xbps-install', 'eopkg'].map(async (binary) => {
-        if (await exists(path.join(dir, binary))) found.add(binary);
-      })
-    )
+    managers.map(async (binary) => {
+      const resolved = await resolveBinary(binary);
+      if (resolved !== undefined) found.set(binary, resolved);
+    })
   );
-  return (binary: string) => found.has(binary);
+  return found;
 }
 
-async function binaryExists(binary: string): Promise<boolean> {
+/** First BIN_DIRS hit, so the search order is PATH-like and deterministic. */
+async function resolveBinary(binary: string): Promise<string | undefined> {
   for (const dir of BIN_DIRS) {
-    if (await exists(path.join(dir, binary))) return true;
+    const candidate = path.join(dir, binary);
+    if (await exists(candidate)) return candidate;
   }
-  return false;
+  return undefined;
 }
 
 async function exists(candidate: string): Promise<boolean> {
