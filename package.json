@@ -142,8 +142,7 @@
     "format": "prettier --check .",
     "format:write": "prettier --write .",
     "test": "npm run compile && node --test \"dist/tsc/test/*.test.js\"",
-    "package": "npx --yes @vscode/vsce package --readme-path dist/build/README.md -o dist/",
-    "vscode:prepublish": "npm run compile && npm run build"
+    "package": "npm run build && cd dist/package && npx --yes @vscode/vsce package --no-dependencies -o ../"
   },
   "devDependencies": {
     "@resvg/resvg-js": "2.6.2",

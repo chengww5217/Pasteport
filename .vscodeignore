@@ -1,33 +1,11 @@
-.vscode/**
-.github/**
-assets/**
-docs/**
-scripts/**
-src/**
-
-# the root package.nls*.json files are what VS Code reads; l10n/nls/ is where they are
-# maintained, and shipping both would double them in the vsix
-l10n/nls/**
-
-# dist/build/** is the only part of dist/ that ships: dist/tsc/ is the tsc output the
-# tests run from, and the finished vsix is written into dist/ itself — without the line
-# below, packaging twice would put the previous vsix inside the next one.
-dist/tsc/**
-dist/*.vsix
-dist/build/**/*.map
-
-# the packaged readme is dist/build/README.md (see --readme-path); excluding the original
-# keeps it from colliding with the copy vsce adds as readme.md
-README.md
-dist/build/README.md
-
-node_modules/**
-.gitignore
-.prettierignore
-.eslintrc.json
-.prettierrc.json
-.editorconfig
-tsconfig.json
-CONTRIBUTING.md
-CODE_OF_CONDUCT.md
-*.vsix
+# Packaging does not happen here.
+#
+# `scripts/build.mjs` assembles a complete extension tree in dist/package/, and
+# `npm run package` runs vsce there. That indirection exists because VS Code reads
+# package.nls*.json only from the extension root: packaging from this directory would
+# mean generating ten of them next to the source, which is what dist/ is for.
+#
+# Ignoring everything is deliberate. A stray `vsce package` run here would otherwise
+# succeed and produce a vsix with no translations at all — a silent failure. As it stands
+# such a run fails outright, and the reader ends up at this comment.
+**

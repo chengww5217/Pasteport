@@ -8,7 +8,7 @@ are especially useful — that command prints every condition a successful paste
 ```sh
 npm install
 npm run compile      # tsc, strict; type-checks into dist/tsc/, which the tests run from
-npm run build        # esbuild bundle + icon + packaged readme into dist/build/, plus package.nls*.json
+npm run build        # esbuild bundle + icon into dist/build/, then assembles dist/package/
 npm run lint         # eslint, type-aware rules
 npm run format       # prettier --check (use format:write to fix)
 npm test             # compile + node:test
@@ -43,10 +43,27 @@ Every generated file lives under `dist/`, and nothing under it is committed. The
 have different fates, which is the whole reason they are kept apart:
 
 ```
-dist/build/                 what ships — produced by scripts/build.mjs
+dist/build/                 the bundle and icon an F5 session loads, where package.json points
+dist/package/               a complete extension tree — the only thing vsce is ever pointed at
 dist/tsc/                   tsc output — type-checking and tests only, never packaged
 dist/pasteport-<version>.vsix   the finished package
 ```
+
+`npm run package` assembles `dist/package/` and runs vsce **inside it**, not in the repository root.
+That indirection is there because VS Code resolves the `%key%` placeholders in `package.json` against
+`package.nls*.json` in the extension root and nowhere else: packaging from the repository would mean
+generating ten of those next to hand-written source. The root `.vscodeignore` ignores everything, so
+a stray `vsce package` there fails instead of quietly producing a vsix with no translations.
+
+The staged manifest differs from the committed one in four ways, all in `stagedManifest()`: `scripts`
+and `devDependencies` are dropped, because nothing in that tree could run them, and `main` and `icon`
+are flattened to `./extension.js` and `icon.png`, because the tree is flat. The committed values
+point into `dist/build/` so that <kbd>F5</kbd> finds the bundle in the repository.
+
+One consequence worth knowing: an F5 dev session has no `package.nls*.json` next to its manifest, so
+command titles and setting descriptions appear as raw `%key%` placeholders there. Everything the
+extension shows at runtime goes through `vscode.l10n.t` and is translated normally; to see the
+manifest strings resolved, install the packaged vsix.
 
 `scripts/build.mjs` produces everything shipped that is not checked in:
 
@@ -58,15 +75,12 @@ dist/pasteport-<version>.vsix   the finished package
 - **`dist/build/icon.png`** — 256×256, because the Marketplace and the Extensions view accept raster
   icons only. `assets/icon.svg` is the source of truth and the only icon file in the repository;
   edit the SVG, the PNG is disposable.
-- **`dist/build/README.md`** — a copy of `README.md` with the `<!-- icon:begin -->` block removed.
+- **`dist/package/README.md`** — a copy of `README.md` with the `<!-- icon:begin -->` block removed.
   vsce refuses an SVG anywhere in a README, and the Marketplace renders the icon in the page header
-  anyway, so the image is shown on GitHub and left out of the package. `npm run package` passes
-  `--readme-path dist/build/README.md`; keep that flag on any hand-rolled vsce invocation, and note
-  that `README.md` itself is in `.vscodeignore` so the two copies cannot collide.
-- **`./package.nls*.json`** — the only generated files outside `dist/`, because VS Code resolves the
-  `%key%` placeholders in `package.json` against the extension root and nowhere else. The sources are
-  `l10n/nls/*`, so translation stays in one directory instead of ten files in the repo root; the root
-  copies are gitignored, and `.vscodeignore` excludes `l10n/nls/` so the vsix carries one copy.
+  anyway, so the image is shown on GitHub and left out of the package.
+- **`dist/package/package.nls*.json`** — copies of `l10n/nls/*`, which is where they are maintained.
+  Each is parsed on the way through, and the build fails if the manifest uses a `%key%` the fallback
+  bundle does not define; a malformed or incomplete bundle otherwise degrades a locale silently.
 
 `tsc` output goes to `dist/tsc/` and is never packaged: it exists to type-check and to give the tests
 plain unbundled modules to run against, which a single bundle cannot provide — it exposes only the
@@ -137,9 +151,11 @@ Everything translatable lives under `l10n/`, in two halves, because VS Code load
   **is** the English sentence, so `vscode.l10n.t('Send')` and the bundle entry must match character
   for character.
 
-VS Code only reads `package.nls*.json` from the extension root, so `npm run build` copies
-`l10n/nls/` there. Those copies are generated and gitignored; edit the ones under `l10n/nls/`. Run
-the build once before pressing F5, or the settings UI shows raw `%key%` placeholders.
+VS Code only reads `package.nls*.json` from the extension root, so `npm run build` copies `l10n/nls/`
+into `dist/package/` — the tree vsce packages — rather than into the repository root. Nothing
+translatable is generated next to hand-written source, and the build fails if the manifest uses a
+`%key%` the fallback bundle does not define. The cost is that an F5 dev session shows raw `%key%`
+placeholders for command titles and setting descriptions; runtime strings are unaffected.
 
 Log lines are deliberately not translated: they are what a bug report carries, and an English log is
 readable by everyone who might act on it. Only what a user is shown goes through `l10n.t`.
