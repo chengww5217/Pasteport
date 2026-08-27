@@ -5,7 +5,12 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
 ## [0.0.1] - 2026-08-24
+
+Released on the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=chengww.pasteport)
+and [Open VSX](https://open-vsx.org/extension/chengww/pasteport).
 
 ### Added
 
@@ -48,3 +53,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `quoting: auto` inserts paths verbatim while quote handling in TUI agents is unverified.
 - A transfer already in flight cannot be interrupted mid-file: `workspace.fs.writeFile` has no
   cancellation point, so cancelling stops the transfer between files.
+
+[unreleased]: https://github.com/chengww5217/pasteport/compare/v0.0.1...HEAD
+[0.0.1]: https://github.com/chengww5217/pasteport/releases/tag/v0.0.1
