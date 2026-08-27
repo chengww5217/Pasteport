@@ -1,6 +1,6 @@
 {
   "extension.description": "Pulsa la tecla de pegar en el terminal de una ventana remota de VS Code: la imagen o los archivos de tu portapapeles local se envían al host remoto y la ruta remota aparece en el prompt, lista para que la lea un agente de línea de comandos.",
-  "capabilities.untrustedWorkspaces.description": "Pasteport solo lee el portapapeles y escribe en el directorio remoto configurado; el ámbito de esa opción es la máquina, así que un espacio de trabajo no confiable no puede redirigirla.",
+  "capabilities.untrustedWorkspaces.description": "Pasteport solo lee el portapapeles y escribe en el directorio remoto configurado; ese directorio puede ser reemplazado por el espacio de trabajo, así que abra solo espacios de trabajo de confianza.",
   "command.paste.title": "Pegar en el terminal remoto",
   "command.cancelTransfer.title": "Cancelar la transferencia",
   "command.cleanUpRemoteFiles.title": "Limpiar los archivos remotos",

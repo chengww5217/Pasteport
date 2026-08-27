@@ -1,6 +1,6 @@
 {
   "extension.description": "在 VS Code 远程窗口的终端里按下粘贴键，本机剪贴板中的图片或文件会被送到远程主机，并把远程路径填进提示符，供命令行 AI 助手直接读取。",
-  "capabilities.untrustedWorkspaces.description": "Pasteport 只读取剪贴板并写入所配置的远程目录；该目录设置的作用域是「机器」，因此不受信任的工作区无法改变它。",
+  "capabilities.untrustedWorkspaces.description": "Pasteport 只读取剪贴板并写入所配置的远程目录；该目录可能被当前工作区覆盖，因此请只打开您信任的工作区。",
   "command.paste.title": "粘贴到远程终端",
   "command.cancelTransfer.title": "取消传输",
   "command.cleanUpRemoteFiles.title": "清理远程文件",

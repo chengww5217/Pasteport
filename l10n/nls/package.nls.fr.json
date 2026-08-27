@@ -1,6 +1,6 @@
 {
   "extension.description": "Appuyez sur la touche de collage dans le terminal d'une fenêtre distante VS Code : l'image ou les fichiers de votre presse-papiers local sont envoyés sur l'hôte distant, et le chemin distant apparaît dans l'invite, prêt à être lu par un agent en ligne de commande.",
-  "capabilities.untrustedWorkspaces.description": "Pasteport lit seulement le presse-papiers et écrit dans le répertoire distant configuré ; la portée de ce paramètre est la machine, un espace de travail non approuvé ne peut donc pas le rediriger.",
+  "capabilities.untrustedWorkspaces.description": "Pasteport ne fait que lire le presse-papiers et écrire dans le répertoire distant configuré ; ce répertoire peut être redéfini par l'espace de travail ouvert, n'ouvrez donc que des espaces de travail de confiance.",
   "command.paste.title": "Coller dans le terminal distant",
   "command.cancelTransfer.title": "Annuler le transfert",
   "command.cleanUpRemoteFiles.title": "Nettoyer les fichiers distants",

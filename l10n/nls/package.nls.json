@@ -1,6 +1,6 @@
 {
   "extension.description": "Paste images and files from your local clipboard into a remote terminal — the remote path lands in the prompt, ready for a CLI agent to read.",
-  "capabilities.untrustedWorkspaces.description": "Pasteport only reads the clipboard and writes to the configured remote directory; the directory setting is machine-scoped, so an untrusted workspace cannot redirect it.",
+  "capabilities.untrustedWorkspaces.description": "Pasteport only reads the clipboard and writes to the configured remote directory; that directory can be overridden by the workspace you are in, so only open workspaces you trust.",
   "command.paste.title": "Paste into Remote Terminal",
   "command.cancelTransfer.title": "Cancel Transfer",
   "command.cleanUpRemoteFiles.title": "Clean Up Remote Files",

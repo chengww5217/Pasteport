@@ -96,7 +96,7 @@
         "pasteport.remoteDir": {
           "type": "string",
           "default": "",
-          "scope": "machine",
+          "scope": "window",
           "markdownDescription": "%config.remoteDir.description%"
         },
         "pasteport.quoting": {

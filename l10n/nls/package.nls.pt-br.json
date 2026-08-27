@@ -1,6 +1,6 @@
 {
   "extension.description": "Pressione a tecla de colar no terminal de uma janela remota do VS Code: a imagem ou os arquivos da sua área de transferência local vão para o host remoto e o caminho remoto aparece no prompt, pronto para um agente de linha de comando ler.",
-  "capabilities.untrustedWorkspaces.description": "O Pasteport apenas lê a área de transferência e grava no diretório remoto configurado; o escopo dessa configuração é a máquina, então um workspace não confiável não pode redirecioná-la.",
+  "capabilities.untrustedWorkspaces.description": "O Pasteport apenas lê a área de transferência e grava no diretório remoto configurado; esse diretório pode ser substituído pelo espaço de trabalho, então abra apenas espaços de trabalho confiáveis.",
   "command.paste.title": "Colar no terminal remoto",
   "command.cancelTransfer.title": "Cancelar a transferência",
   "command.cleanUpRemoteFiles.title": "Limpar os arquivos remotos",

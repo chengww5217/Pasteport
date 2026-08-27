@@ -1,6 +1,6 @@
 {
   "extension.description": "在 VS Code 遠端視窗的終端機中按下貼上鍵，本機剪貼簿裡的圖片或檔案會傳送到遠端主機，並把遠端路徑填入提示字元，供命令列 AI 助手直接讀取。",
-  "capabilities.untrustedWorkspaces.description": "Pasteport 只讀取剪貼簿並寫入所設定的遠端目錄；該設定的範圍是「機器」，因此不受信任的工作區無法變更它。",
+  "capabilities.untrustedWorkspaces.description": "Pasteport 只讀取剪貼簿並寫入所設定的遠端目錄；該目錄可能被目前工作區覆寫，因此請只開啟您信任的工作區。",
   "command.paste.title": "貼上到遠端終端機",
   "command.cancelTransfer.title": "取消傳輸",
   "command.cleanUpRemoteFiles.title": "清理遠端檔案",

@@ -1,6 +1,6 @@
 {
   "extension.description": "VS Code のリモートウィンドウのターミナルで貼り付けキーを押すと、ローカルのクリップボードにある画像やファイルがリモートホストへ送られ、そのリモートパスがプロンプトに入ります。CLI エージェントがそのまま読み取れます。",
-  "capabilities.untrustedWorkspaces.description": "Pasteport はクリップボードを読み取り、設定されたリモートディレクトリに書き込むだけです。ディレクトリ設定のスコープはマシンなので、信頼されていないワークスペースが変更することはできません。",
+  "capabilities.untrustedWorkspaces.description": "Pasteport はクリップボードを読み取り、設定されたリモート ディレクトリへ書き込むだけです。そのディレクトリはワークスペースから上書きされ得るため、信頼できるワークスペースのみを開いてください。",
   "command.paste.title": "リモートターミナルに貼り付け",
   "command.cancelTransfer.title": "転送をキャンセル",
   "command.cleanUpRemoteFiles.title": "リモートのファイルを整理",

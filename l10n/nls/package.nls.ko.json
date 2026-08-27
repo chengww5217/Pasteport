@@ -1,6 +1,6 @@
 {
   "extension.description": "VS Code 원격 창의 터미널에서 붙여넣기 키를 누르면 로컬 클립보드의 이미지나 파일이 원격 호스트로 전송되고, 원격 경로가 프롬프트에 입력되어 CLI 에이전트가 바로 읽을 수 있습니다.",
-  "capabilities.untrustedWorkspaces.description": "Pasteport는 클립보드를 읽고 설정된 원격 디렉터리에 쓰는 일만 합니다. 디렉터리 설정의 범위는 머신이므로 신뢰할 수 없는 작업 영역이 이를 바꿀 수 없습니다.",
+  "capabilities.untrustedWorkspaces.description": "Pasteport는 클립보드에서 읽은 내용을 설정된 원격 디렉터리에만 기록합니다. 해당 디렉터리는 작업 공간에서 덮어쓸 수 있으므로 신뢰할 수 있는 작업 공간만 여십시오.",
   "command.paste.title": "원격 터미널에 붙여넣기",
   "command.cancelTransfer.title": "전송 취소",
   "command.cleanUpRemoteFiles.title": "원격 파일 정리",

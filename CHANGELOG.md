@@ -34,6 +34,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   to `/tmp` with a warning. Files land under a `pasteport` subdirectory of whatever was chosen. A
   host that points `TMPDIR` elsewhere is no longer ignored; setting the value explicitly still skips
   detection. Detection is a handful of reads, paid once per remote host per session.
+- `pasteport.remoteDir` is a user-level setting now, like any other — the workspace you have open may
+  override it, so a repository can choose where your pastes land. The setting description and the
+  README say to paste only in workspaces you trust.
 - `Pasteport: Diagnose` reports the resolved remote directory alongside the configured one.
 
 ### Fixed

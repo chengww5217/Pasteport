@@ -1,6 +1,6 @@
 {
   "extension.description": "Drücken Sie die Einfügetaste im Terminal eines VS Code-Remotefensters: Bild oder Dateien aus Ihrer lokalen Zwischenablage gehen zum entfernten Host, und der entfernte Pfad landet in der Eingabeaufforderung — bereit für einen CLI-Agenten.",
-  "capabilities.untrustedWorkspaces.description": "Pasteport liest nur die Zwischenablage und schreibt in das konfigurierte entfernte Verzeichnis; der Geltungsbereich dieser Einstellung ist die Maschine, ein nicht vertrauenswürdiger Arbeitsbereich kann sie also nicht umleiten.",
+  "capabilities.untrustedWorkspaces.description": "Pasteport liest nur die Zwischenablage und schreibt in das konfigurierte Remote-Verzeichnis; dieses Verzeichnis kann vom geöffneten Arbeitsbereich überschrieben werden — öffnen Sie daher nur vertrauenswürdige Arbeitsbereiche.",
   "command.paste.title": "In entferntes Terminal einfügen",
   "command.cancelTransfer.title": "Übertragung abbrechen",
   "command.cleanUpRemoteFiles.title": "Entfernte Dateien aufräumen",
