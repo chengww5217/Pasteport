@@ -136,17 +136,41 @@ paste depends on, which makes a bug report much easier to act on.
 
 ## Settings
 
-| Setting                         | Default          | Description                                                      |
-| ------------------------------- | ---------------- | ---------------------------------------------------------------- |
-| `pasteport.remoteDir`           | `/tmp/pasteport` | Absolute POSIX directory on the remote host. `~` is not expanded |
-| `pasteport.quoting`             | `auto`           | `auto`, `shell` (quote special characters) or `none` (verbatim)  |
-| `pasteport.trailingSpace`       | `true`           | Append a space after the inserted path                           |
-| `pasteport.confirmAboveSeconds` | `5`              | Ask before transfers estimated to take longer; `0` never asks    |
-| `pasteport.ttlHours`            | `24`             | Age at which pasted files are cleaned up; `0` disables           |
-| `pasteport.bracketedPaste`      | `false`          | Wrap the insertion in bracketed paste markers                    |
+| Setting                         | Default   | Description                                                        |
+| ------------------------------- | --------- | ------------------------------------------------------------------ |
+| `pasteport.remoteDir`           | _(empty)_ | Absolute POSIX directory on the remote host; empty means detect it |
+| `pasteport.quoting`             | `auto`    | `auto`, `shell` (quote special characters) or `none` (verbatim)    |
+| `pasteport.trailingSpace`       | `true`    | Append a space after the inserted path                             |
+| `pasteport.confirmAboveSeconds` | `5`       | Ask before transfers estimated to take longer; `0` never asks      |
+| `pasteport.ttlHours`            | `24`      | Age at which pasted files are cleaned up; `0` disables             |
+| `pasteport.bracketedPaste`      | `false`   | Wrap the insertion in bracketed paste markers                      |
 
 `pasteport.remoteDir` is machine-scoped: it can be set per user or per machine, but not per
 workspace. The value is written into your terminal, so a repository is not allowed to choose it.
+`~` is not expanded — `workspace.fs` does not resolve it, so it would create a directory literally
+named `~`.
+
+### Where files land
+
+Left empty, `pasteport.remoteDir` is resolved from the remote host rather than assumed to be
+`/tmp`: a host is entitled to point `TMPDIR` somewhere else, and throwaway files for an agent to
+read belong wherever that host says throwaway files go.
+
+The extension has no way to run a command on the remote side — it lives in the local extension
+host. What it does have is `workspace.fs`, whose reads are served by the remote server process, so
+`/proc/self/environ` is that process's own environment. The server was started from your login
+environment, which makes its `TMPDIR` the value the host actually configured. Resolution order:
+
+1. `TMPDIR`, then `TMP`, then `TEMP`, from the remote server's environment — Linux remotes, which
+   covers SSH to Linux, Dev Containers, WSL, Tunnels and Codespaces.
+2. The first of `/tmp` and `/var/tmp` that exists — the path for remotes without procfs, macOS
+   among them.
+3. `/tmp`, with a warning in the log.
+
+Files then land under a `pasteport` subdirectory of whatever was chosen, and only that
+subdirectory is ever written to or swept. The result is logged once per host and reported by
+`Pasteport: Diagnose`, so there is never a question about where a paste went. Setting the value
+explicitly skips detection entirely.
 
 About `quoting`: the target is a TUI agent that treats your input as literal text, where a quote
 character becomes part of the path and silently breaks it. `auto` therefore inserts paths verbatim

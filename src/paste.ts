@@ -26,6 +26,8 @@ export interface PasteDependencies {
   reader: ClipboardReader | undefined;
   transfer: TransferService;
   readConfig: () => PasteportConfig;
+  /** Turns the setting into a directory, detecting one when it is unset. */
+  resolveRemoteDir: (template: vscode.Uri, configured: string | undefined) => Promise<string>;
   log: Logger;
 }
 
@@ -82,6 +84,8 @@ export async function paste(deps: PasteDependencies): Promise<void> {
   }
 
   const config = deps.readConfig();
+  const remoteDir = await deps.resolveRemoteDir(template, config.remoteDir);
+
   let sources: SourceFile[];
   try {
     sources = await describeSources(payload.paths, payload.kind);
@@ -94,12 +98,12 @@ export async function paste(deps: PasteDependencies): Promise<void> {
   const total = sources.reduce((sum, file) => sum + file.size, 0);
   log.info(
     `sending ${sources.length} ${payload.kind === 'image' ? 'image' : 'file'}(s), ` +
-      `${formatBytes(total)} total, to ${template.authority}:${config.remoteDir}`
+      `${formatBytes(total)} total, to ${template.authority}:${remoteDir}`
   );
 
   const outcome = await deps.transfer.transfer(sources, {
     template,
-    remoteDir: config.remoteDir,
+    remoteDir,
     confirmAboveSeconds: config.confirmAboveSeconds,
   });
 

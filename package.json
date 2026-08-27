@@ -89,9 +89,9 @@
       "properties": {
         "pasteport.remoteDir": {
           "type": "string",
-          "default": "/tmp/pasteport",
+          "default": "",
           "scope": "machine",
-          "markdownDescription": "Absolute POSIX directory on the remote host where pasted files land. `~` is not expanded."
+          "markdownDescription": "Absolute POSIX directory on the remote host where pasted files land. Leave empty to use the remote host's own temp directory (its `TMPDIR`, falling back to `/tmp`) with a `pasteport` subdirectory. `~` is not expanded."
         },
         "pasteport.quoting": {
           "type": "string",

@@ -7,6 +7,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- `pasteport.remoteDir` now defaults to empty, which means "detect it". The remote host's own
+  `TMPDIR` is read out of the remote server process's environment through `workspace.fs`
+  (`/proc/self/environ`), falling back to the first of `/tmp` and `/var/tmp` that exists, and then
+  to `/tmp` with a warning. Files land under a `pasteport` subdirectory of whatever was chosen. A
+  host that points `TMPDIR` elsewhere is no longer ignored; setting the value explicitly still skips
+  detection. Detection costs at most two round trips, once per remote host per session.
+- `Pasteport: Diagnose` reports the resolved remote directory alongside the configured one.
+
 ## [0.0.1] - 2026-08-24
 
 Released on the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=chengww.pasteport)

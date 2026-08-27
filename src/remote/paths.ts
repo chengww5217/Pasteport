@@ -6,9 +6,10 @@
  * The fingerprint is a directory rather than a filename prefix so the original
  * name survives: an agent reads `report.zip`, not `a1b2c3d4.zip`, while two
  * different files can never collide.
+ *
+ * Where `<remoteDir>` itself comes from is tempDir.ts's problem, not this
+ * module's: everything here works on a directory it is handed.
  */
-
-export const DEFAULT_REMOTE_DIR = '/tmp/pasteport';
 
 /** Longest name segment we will write; leaves room under the usual 255-byte cap. */
 const MAX_NAME_LENGTH = 200;

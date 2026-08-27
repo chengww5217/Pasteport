@@ -6,6 +6,7 @@ import { formatBytes } from './format';
 import { describeError, type Logger } from './log';
 import { paste } from './paste';
 import { sweepRemote, sweepStaging } from './remote/sweeper';
+import { RemoteDirResolver } from './remote/remoteDir';
 import { isWritableRemote, remoteTemplateUri } from './remote/target';
 import { TransferService, type RateStore } from './remote/transfer';
 import { ensurePasteKeyReachesExtension, type PromptSuppression } from './skipShell';
@@ -35,6 +36,7 @@ export function activate(context: vscode.ExtensionContext): void {
   }
 
   const transfer = new TransferService(log, rateStore(context));
+  const remoteDirs = new RemoteDirResolver(log);
   let pasteInFlight = false;
 
   context.subscriptions.push(
@@ -48,7 +50,13 @@ export function activate(context: vscode.ExtensionContext): void {
       }
       pasteInFlight = true;
       try {
-        await paste({ reader, transfer, readConfig: () => readConfig(log), log });
+        await paste({
+          reader,
+          transfer,
+          readConfig: () => readConfig(log),
+          resolveRemoteDir: (template, configured) => remoteDirs.resolve(template, configured),
+          log,
+        });
       } catch (err) {
         log.error(`unexpected paste failure: ${describeError(err)}`);
       } finally {
@@ -62,16 +70,21 @@ export function activate(context: vscode.ExtensionContext): void {
       }
     }),
 
-    vscode.commands.registerCommand('pasteport.cleanUpRemoteFiles', () => cleanUp(log, true)),
+    vscode.commands.registerCommand('pasteport.cleanUpRemoteFiles', () =>
+      cleanUp(log, remoteDirs, true)
+    ),
 
-    vscode.commands.registerCommand('pasteport.diagnose', () => diagnose(log, reader, transfer))
+    vscode.commands.registerCommand('pasteport.diagnose', () =>
+      diagnose(log, reader, transfer, remoteDirs)
+    )
   );
 
   log.info(`Pasteport activated on ${process.platform}, VS Code ${vscode.version}`);
 
   // Cleanup is best-effort background work: it must never delay a paste, and a
-  // failure here is not worth a dialog.
-  void cleanUp(log, false);
+  // failure here is not worth a dialog. It also warms the remote directory
+  // resolver, so the first paste of a session does not pay for detection.
+  void cleanUp(log, remoteDirs, false);
 
   // On Windows and Linux the keybinding is only useful if the command is allowed
   // to skip the shell. Nothing to check when no reader exists: the command would
@@ -109,7 +122,11 @@ function skipShellPromptSuppression(context: vscode.ExtensionContext): PromptSup
  *
  * @param interactive whether to report the result to the user.
  */
-async function cleanUp(log: Logger, interactive: boolean): Promise<void> {
+async function cleanUp(
+  log: Logger,
+  remoteDirs: RemoteDirResolver,
+  interactive: boolean
+): Promise<void> {
   const config = readConfig(log);
   const template = remoteTemplateUri();
 
@@ -127,7 +144,7 @@ async function cleanUp(log: Logger, interactive: boolean): Promise<void> {
 
   const remote = await sweepRemote({
     template,
-    remoteDir: config.remoteDir,
+    remoteDir: await remoteDirs.resolve(template, config.remoteDir),
     ttlHours: config.ttlHours,
     log,
   });
@@ -149,7 +166,8 @@ async function cleanUp(log: Logger, interactive: boolean): Promise<void> {
 async function diagnose(
   log: Logger,
   reader: ClipboardReader | undefined,
-  transfer: TransferService
+  transfer: TransferService,
+  remoteDirs: RemoteDirResolver
 ): Promise<void> {
   log.show(true);
   log.info('--- Pasteport diagnostics ---');
@@ -165,8 +183,9 @@ async function diagnose(
 
   const config = readConfig(log);
   log.info(
-    `config                  : remoteDir=${config.remoteDir} quoting=${config.quoting} ` +
-      `trailingSpace=${config.trailingSpace} confirmAboveSeconds=${config.confirmAboveSeconds} ` +
+    `config                  : remoteDir=${config.remoteDir ?? '(auto)'} ` +
+      `quoting=${config.quoting} trailingSpace=${config.trailingSpace} ` +
+      `confirmAboveSeconds=${config.confirmAboveSeconds} ` +
       `ttlHours=${config.ttlHours} bracketedPaste=${config.bracketedPaste}`
   );
 
@@ -176,6 +195,7 @@ async function diagnose(
   } else {
     log.info(`remote template         : ${template.scheme}://${template.authority}`);
     log.info(`isWritableFileSystem    : ${String(isWritableRemote(template))}`);
+    log.info(`resolved remote dir     : ${await remoteDirs.resolve(template, config.remoteDir)}`);
   }
 
   if (reader === undefined) return;

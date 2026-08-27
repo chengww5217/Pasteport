@@ -91,6 +91,12 @@ payload; `src/paste.ts` is the only module with business branching, and everythi
 handle falls through to the terminal's own paste. Transfers go through `workspace.fs` with a URI
 borrowed from the window, which is why no backend-specific code exists.
 
+Nothing can be executed on the remote side from a `ui` extension, so anything the remote host has to
+be asked is asked with a read. `src/remote/tempDir.ts` is the one place that does this: it reads
+`/proc/self/environ`, which `workspace.fs` serves from the remote server process, to learn the
+`TMPDIR` that host actually configured. New remote-side questions belong there, and they have to be
+answerable by reading a file.
+
 Adding a reader for another platform means writing a new program that emits the same JSON contract
 (see `src/clipboard/types.ts`) plus a thin host wrapper alongside `src/clipboard/darwin.ts`. The
 readers share no code — the platform APIs have nothing in common — only the contract. They live in

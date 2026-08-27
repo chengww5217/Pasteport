@@ -2,14 +2,19 @@ import * as vscode from 'vscode';
 
 import { describeError, type Logger } from './log';
 import type { QuotingMode } from './quoting';
-import { DEFAULT_REMOTE_DIR, normalizeRemoteDir } from './remote/paths';
+import { normalizeRemoteDir } from './remote/paths';
 
 /**
  * Settings, read fresh on every paste so a change takes effect immediately
  * without a reload and without a change listener to keep in sync.
  */
 export interface PasteportConfig {
-  remoteDir: string;
+  /**
+   * Undefined when the setting is empty, which means "detect the remote host's
+   * temp directory"; see remote/tempDir.ts. Resolving it needs a remote round
+   * trip, so it deliberately does not happen here.
+   */
+  remoteDir: string | undefined;
   quoting: QuotingMode;
   trailingSpace: boolean;
   confirmAboveSeconds: number;
@@ -33,19 +38,22 @@ export function readConfig(log: Logger): PasteportConfig {
 }
 
 /**
- * An unusable remoteDir falls back to the default rather than failing the
- * paste: the user gets their file across, plus a log line explaining where it
- * went and why.
+ * An unset remoteDir is the default and means detection; an unusable one falls
+ * back to detection too rather than failing the paste, so the user gets their
+ * file across plus a log line explaining why the setting was ignored.
  */
-function readRemoteDir(section: vscode.WorkspaceConfiguration, log: Logger): string {
-  const configured = section.get<string>('remoteDir', DEFAULT_REMOTE_DIR);
+function readRemoteDir(section: vscode.WorkspaceConfiguration, log: Logger): string | undefined {
+  const configured = section.get<string>('remoteDir', '');
+  if (configured.trim() === '') return undefined;
+
   try {
     return normalizeRemoteDir(configured);
   } catch (err) {
     log.warn(
-      `pasteport.remoteDir is unusable (${describeError(err)}); falling back to ${DEFAULT_REMOTE_DIR}`
+      `pasteport.remoteDir is unusable (${describeError(err)}); ` +
+        "detecting the remote host's temp directory instead"
     );
-    return DEFAULT_REMOTE_DIR;
+    return undefined;
   }
 }
 

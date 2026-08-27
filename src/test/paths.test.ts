@@ -2,7 +2,6 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import {
-  DEFAULT_REMOTE_DIR,
   normalizeRemoteDir,
   remoteDirForFingerprint,
   remoteFilePath,
@@ -10,7 +9,7 @@ import {
 } from '../remote/paths';
 
 test('normalizeRemoteDir canonicalises absolute paths', () => {
-  assert.equal(normalizeRemoteDir(DEFAULT_REMOTE_DIR), '/tmp/pasteport');
+  assert.equal(normalizeRemoteDir('/tmp/pasteport'), '/tmp/pasteport');
   assert.equal(normalizeRemoteDir('  /tmp/pasteport/  '), '/tmp/pasteport');
   assert.equal(normalizeRemoteDir('/tmp//pasteport///x'), '/tmp/pasteport/x');
 });
