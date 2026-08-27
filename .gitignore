@@ -2,6 +2,11 @@
 dist/
 *.vsix
 
+# Copies of l10n/nls/*, written to the root by scripts/build.mjs because VS Code reads
+# them from nowhere else. The sources are tracked; these are not.
+/package.nls.json
+/package.nls.*.json
+
 # --- dependencies ---
 node_modules/
 

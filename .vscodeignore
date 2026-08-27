@@ -1,8 +1,13 @@
 .vscode/**
 .github/**
 assets/**
+docs/**
 scripts/**
 src/**
+
+# the root package.nls*.json files are what VS Code reads; l10n/nls/ is where they are
+# maintained, and shipping both would double them in the vsix
+l10n/nls/**
 
 # dist/build/** is the only part of dist/ that ships: dist/tsc/ is the tsc output the
 # tests run from, and the finished vsix is written into dist/ itself — without the line

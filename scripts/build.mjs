@@ -1,9 +1,10 @@
 #!/usr/bin/env node
-// Produces everything the vsix contains that is not checked in, all of it under dist/build/:
+// Produces everything the vsix contains that is not checked in:
 //
-//   src/extension.ts -> dist/build/extension.js  one bundled, minified CommonJS file
-//   assets/icon.svg  -> dist/build/icon.png      the Marketplace accepts raster icons only
-//   README.md        -> dist/build/README.md     the Marketplace rejects SVG in a README
+//   src/extension.ts      -> dist/build/extension.js  one bundled, minified CommonJS file
+//   assets/icon.svg       -> dist/build/icon.png      the Marketplace accepts raster icons only
+//   README.md             -> dist/build/README.md     the Marketplace rejects SVG in a README
+//   l10n/nls/package.nls* -> ./package.nls*.json      VS Code only reads these from the root
 //
 // `npm run compile` is a separate step: it type-checks into dist/tsc/, which is where
 // the tests run from and which is never packaged. esbuild does not type-check, so
@@ -11,7 +12,7 @@
 //
 // Pass --watch to rebuild the bundle on change, unminified and with a source map.
 
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, readdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Resvg } from '@resvg/resvg-js';
@@ -22,6 +23,29 @@ const outDir = resolve(root, 'dist/build');
 const watch = process.argv.includes('--watch');
 
 mkdirSync(outDir, { recursive: true });
+
+// --- manifest translations ----------------------------------------------------
+// VS Code resolves the %key% placeholders in package.json against package.nls*.json
+// in the extension root, and nowhere else. The sources live in l10n/nls/ so that all
+// translation sits in one directory instead of ten files in the repo root; these
+// copies are generated, and .gitignore says as much.
+const nlsDir = resolve(root, 'l10n/nls');
+const nlsFiles = readdirSync(nlsDir).filter((name) =>
+  /^package\.nls(\.[a-z]{2}(-[a-z]+)?)?\.json$/.test(name)
+);
+
+if (!nlsFiles.includes('package.nls.json')) {
+  throw new Error('l10n/nls/package.nls.json is missing; it is the fallback for every locale');
+}
+
+for (const name of nlsFiles) {
+  const source = readFileSync(resolve(nlsDir, name), 'utf8');
+  // Parsed rather than copied blindly: a malformed bundle does not fail at load
+  // time, it silently degrades that locale back to raw %key% placeholders.
+  JSON.parse(source);
+  writeFileSync(resolve(root, name), source);
+}
+console.log(`nls:    ${nlsFiles.length} file(s) -> ./package.nls*.json`);
 
 // --- bundle -------------------------------------------------------------------
 // One file instead of a tree of tsc output: the extension host loads a single

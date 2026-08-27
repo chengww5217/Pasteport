@@ -13,6 +13,8 @@ import { test } from 'node:test';
  */
 const ROOT = path.resolve(__dirname, '..', '..', '..');
 const L10N_DIR = path.join(ROOT, 'l10n');
+/** Sources for the root package.nls*.json copies that scripts/build.mjs writes. */
+const NLS_DIR = path.join(L10N_DIR, 'nls');
 
 /** Placeholders `vscode.l10n.t` substitutes, e.g. `{0}`. */
 const PLACEHOLDER = /\{\d+\}/g;
@@ -79,6 +81,13 @@ function translationBundles(): string[] {
     .sort();
 }
 
+function nlsTranslations(): string[] {
+  return fs
+    .readdirSync(NLS_DIR)
+    .filter((name) => /^package\.nls\..+\.json$/.test(name))
+    .sort();
+}
+
 test('every localised string in the source is in the English bundle', () => {
   const english = readJson(path.join(L10N_DIR, 'bundle.l10n.json'));
   const requested = requestedKeys();
@@ -136,25 +145,22 @@ test('translations keep every placeholder the English string has', () => {
 test('package.json placeholders all resolve, in every language', () => {
   const manifest = fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8');
   const used = new Set([...manifest.matchAll(/"%([^%"]+)%"/g)].map((m) => m[1] as string));
-  const english = readJson(path.join(ROOT, 'package.nls.json'));
+  const english = readJson(path.join(NLS_DIR, 'package.nls.json'));
 
   assert.ok(used.size > 0, 'package.json uses no %nls% placeholders');
 
   for (const key of used) {
-    assert.ok(key in english, `package.nls.json is missing ${key}`);
+    assert.ok(key in english, `l10n/nls/package.nls.json is missing ${key}`);
   }
   for (const key of Object.keys(english)) {
-    assert.ok(used.has(key), `package.nls.json has an unused key: ${key}`);
+    assert.ok(used.has(key), `l10n/nls/package.nls.json has an unused key: ${key}`);
   }
 
-  const locales = fs
-    .readdirSync(ROOT)
-    .filter((name) => /^package\.nls\..+\.json$/.test(name))
-    .sort();
+  const locales = nlsTranslations();
   assert.ok(locales.length > 0, 'no translated package.nls files found');
 
   for (const name of locales) {
-    const translated = readJson(path.join(ROOT, name));
+    const translated = readJson(path.join(NLS_DIR, name));
     for (const key of Object.keys(english)) {
       const value = translated[key];
       assert.ok(value !== undefined, `${name} is missing ${key}`);
@@ -172,11 +178,27 @@ test('the same set of languages is offered by both halves of the UI', () => {
   const bundleLocales = translationBundles()
     .map((name) => name.replace(/^bundle\.l10n\.(.+)\.json$/, '$1'))
     .sort();
-  const manifestLocales = fs
-    .readdirSync(ROOT)
-    .filter((name) => /^package\.nls\..+\.json$/.test(name))
+  const manifestLocales = nlsTranslations()
     .map((name) => name.replace(/^package\.nls\.(.+)\.json$/, '$1'))
     .sort();
 
   assert.deepEqual(bundleLocales, manifestLocales);
+});
+
+test('every translated language has a documented README, or none does', () => {
+  // The docs are translated into a subset of the UI languages on purpose — a
+  // README is prose, not a string table — but a link that goes nowhere is a bug.
+  const readmes = fs
+    .readdirSync(path.join(ROOT, 'docs'))
+    .filter((name) => /^README\..+\.md$/.test(name));
+
+  assert.ok(readmes.length > 0, 'docs/ has no translated README');
+
+  for (const name of readmes) {
+    const locale = name.replace(/^README\.(.+)\.md$/, '$1').toLowerCase();
+    assert.ok(
+      fs.existsSync(path.join(NLS_DIR, `package.nls.${locale}.json`)),
+      `docs/${name} is a language the extension itself is not translated into`
+    );
+  }
 });

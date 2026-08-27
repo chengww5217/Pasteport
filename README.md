@@ -11,6 +11,13 @@
   <a href="https://open-vsx.org/extension/chengww/pasteport"><img src="https://img.shields.io/open-vsx/v/chengww/pasteport?label=Open%20VSX" alt="Open VSX version" /></a>
 </p>
 
+<p align="center">
+  <strong>English</strong> ·
+  <a href="https://github.com/chengww5217/Pasteport/blob/main/docs/README.zh-CN.md">简体中文</a> ·
+  <a href="https://github.com/chengww5217/Pasteport/blob/main/docs/README.zh-TW.md">繁體中文</a> ·
+  <a href="https://github.com/chengww5217/Pasteport/blob/main/docs/README.ja.md">日本語</a>
+</p>
+
 Press the paste key in the terminal of a VS Code **remote window** and the image or files on your
 local clipboard are sent to the remote host — then the **remote path** is typed into your prompt,
 ready for a CLI agent to read.

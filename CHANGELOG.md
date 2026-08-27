@@ -14,6 +14,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   itself. Command titles and setting descriptions come from `package.nls.*.json`, dialogs and
   notifications from `l10n/bundle.l10n.*.json`. Log output stays English on purpose: it is what a bug
   report carries.
+- Translated documentation: `docs/README.zh-CN.md`, `docs/README.zh-TW.md` and `docs/README.ja.md`,
+  linked from the top of every README. They are excluded from the vsix, where the Marketplace shows
+  the English one.
 
 ### Changed
 

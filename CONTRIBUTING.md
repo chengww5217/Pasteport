@@ -8,7 +8,7 @@ are especially useful — that command prints every condition a successful paste
 ```sh
 npm install
 npm run compile      # tsc, strict; type-checks into dist/tsc/, which the tests run from
-npm run build        # esbuild bundle + icon + packaged readme, all into dist/build/
+npm run build        # esbuild bundle + icon + packaged readme into dist/build/, plus package.nls*.json
 npm run lint         # eslint, type-aware rules
 npm run format       # prettier --check (use format:write to fix)
 npm test             # compile + node:test
@@ -63,6 +63,10 @@ dist/pasteport-<version>.vsix   the finished package
   anyway, so the image is shown on GitHub and left out of the package. `npm run package` passes
   `--readme-path dist/build/README.md`; keep that flag on any hand-rolled vsce invocation, and note
   that `README.md` itself is in `.vscodeignore` so the two copies cannot collide.
+- **`./package.nls*.json`** — the only generated files outside `dist/`, because VS Code resolves the
+  `%key%` placeholders in `package.json` against the extension root and nowhere else. The sources are
+  `l10n/nls/*`, so translation stays in one directory instead of ten files in the repo root; the root
+  copies are gitignored, and `.vscodeignore` excludes `l10n/nls/` so the vsix carries one copy.
 
 `tsc` output goes to `dist/tsc/` and is never packaged: it exists to type-check and to give the tests
 plain unbundled modules to run against, which a single bundle cannot provide — it exposes only the
@@ -125,13 +129,17 @@ behave exactly like the paste it displaced.
 
 ## Localisation
 
-The UI is translated in two halves, because VS Code loads them differently:
+Everything translatable lives under `l10n/`, in two halves, because VS Code loads them differently:
 
-- `package.nls.json` and `package.nls.<locale>.json` cover everything in `package.json` — command
-  titles, setting descriptions. The manifest refers to them as `%key%`.
+- `l10n/nls/package.nls.json` and `l10n/nls/package.nls.<locale>.json` cover everything in
+  `package.json` — command titles, setting descriptions. The manifest refers to them as `%key%`.
 - `l10n/bundle.l10n.json` and `l10n/bundle.l10n.<locale>.json` cover everything in the code. The key
   **is** the English sentence, so `vscode.l10n.t('Send')` and the bundle entry must match character
   for character.
+
+VS Code only reads `package.nls*.json` from the extension root, so `npm run build` copies
+`l10n/nls/` there. Those copies are generated and gitignored; edit the ones under `l10n/nls/`. Run
+the build once before pressing F5, or the settings UI shows raw `%key%` placeholders.
 
 Log lines are deliberately not translated: they are what a bug report carries, and an English log is
 readable by everyone who might act on it. Only what a user is shown goes through `l10n.t`.
@@ -144,6 +152,11 @@ Adding a language means one file in each half, and both must be added together �
 `src/test/l10n.test.ts` fails if the two sets of locales disagree, if a key is missing, empty or
 stale, or if a translation drops a `{0}` placeholder. Locale names follow VS Code's own display
 languages, lowercased: `zh-cn`, `pt-br`, and so on.
+
+Translated READMEs live in `docs/README.<locale>.md` and are excluded from the vsix; the Marketplace
+shows the English one. They cover a subset of the interface languages on purpose — a README is prose
+that has to be kept in step with the code, not a string table — and the test requires each one to be
+a language the extension itself is translated into.
 
 ## Releasing
 
